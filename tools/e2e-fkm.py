@@ -35,6 +35,9 @@ with sync_playwright() as p:
         pg.route('https://fonts.**', lambda r: r.abort())
         pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.goto(B); pg.wait_for_load_state('networkidle')
+        pg.wait_for_selector('.fk-login .auth-card #f-email'); no_hscroll(pg, vp + ' log masuk')
+        assert 'Intelligence Dashboard' in pg.text_content('.fk-login h1')
+        pg.screenshot(path=os.path.join(SHOTS, 'fkm-%s-0-login.png' % vp))
 
         # ---- Pentadbir (Super Admin): 13 halaman rupa sistem lama
         login(pg, 'super@demo.local')
@@ -48,10 +51,29 @@ with sync_playwright() as p:
         assert pg.locator('[data-tbl] tr[data-sid]').count() == 1, 'carian'
         pg.fill('[data-q]', ''); pg.select_option('[data-f="jabatan"]', 'KBPI'); pg.wait_for_timeout(200)
         assert 0 < pg.locator('[data-tbl] tr[data-sid]').count() < n_all, 'penapis jabatan'
+        sid = pg.get_attribute('[data-tbl] tr[data-sid]', 'data-sid')
         pg.click('[data-tbl] tr[data-sid] td:first-child'); pg.wait_for_selector('.fk-modal:not(.hidden) .fk-ring'); no_hscroll(pg, vp + ' profil')
-        assert pg.locator('.fk-modal .fk-gap-list li').count() >= 1 and pg.locator('.fk-modal a[href*="/sunting"]').count() == 1
+        assert pg.locator('.fk-modal .fk-gap-list li').count() >= 1 and pg.locator('.fk-modal [data-act="fk-edit"]').count() == 1
         pg.screenshot(path=os.path.join(SHOTS, 'fkm-%s-3-profil.png' % vp), full_page=True)
+        # Borang sunting bertab: tukar tab, ubah medan, kiraan perubahan, simpan
+        pg.click('.fk-modal [data-act="fk-edit"]'); pg.wait_for_selector('.fk-ef-tab[data-tab="penyelidikan"]'); no_hscroll(pg, vp + ' borang sunting')
+        assert pg.locator('#ef_staffId[readonly]').count() == 1, 'Staff ID dikunci'
+        pg.click('.fk-ef-tab[data-tab="penyelidikan"]'); SIT = '4321' if vp == 'desktop' else '5432'; pg.fill('#ef_sitasi', SIT)
+        assert '(1)' in pg.text_content('.fk-ef-tab[data-tab="penyelidikan"]') and '1 perubahan' in pg.text_content('[data-ef-count]')
+        pg.screenshot(path=os.path.join(SHOTS, 'fkm-%s-3b-sunting.png' % vp))
+        pg.click('[data-act="ef-save"]'); pg.wait_for_selector('.fk-modal.hidden', state='attached', timeout=20000)
+        pg.wait_for_selector('[data-tbl] tr[data-sid="%s"]' % sid)
+        pg.click('[data-tbl] tr[data-sid="%s"] td:first-child' % sid); pg.wait_for_selector('.fk-modal:not(.hidden) .fk-ring')
+        assert '{:,}'.format(int(SIT)) in pg.text_content('.fk-modal'), 'sitasi disimpan'
         pg.keyboard.press('Escape'); pg.wait_for_selector('.fk-modal.hidden', state='attached')
+        # Tambah staf: medan wajib disahkan pelayan, kemudian berjaya
+        pg.click('[data-act="fk-add"]'); pg.wait_for_selector('#ef_staffId:not([readonly])')
+        pg.fill('#ef_staffId', '88' + ('1' if vp == 'desktop' else '2') + '01'); pg.click('[data-act="ef-save"]'); pg.wait_for_timeout(1200)
+        assert pg.is_visible('.fk-modal:not(.hidden)') and pg.text_content('[data-ef-err]').strip(), 'nama/jabatan wajib'
+        pg.fill('#ef_nama', 'STAF E2E ' + vp.upper()); pg.select_option('#ef_jabatan', 'TB'); pg.click('[data-act="ef-save"]')
+        pg.wait_for_selector('.fk-modal.hidden', state='attached', timeout=20000)
+        pg.fill('[data-q]', 'STAF E2E ' + vp.upper()); pg.wait_for_timeout(300)
+        assert pg.locator('[data-tbl] tr[data-sid]').count() == 1, 'staf baharu dalam direktori'
         for path, sel in (('/fkm/kenaikan', 'tr[data-sid]'), ('/fkm/latihan', 'tr[data-sid]'), ('/fkm/penyelidikan', 'tr[data-sid]'), ('/fkm/geran', 'tr[data-sid]'),
                           ('/fkm/penyeliaan', 'tr[data-sid]'), ('/fkm/khidmat', 'tr[data-sid]'), ('/fkm/myra', 'tr[data-sid]')):
             visit(pg, path, sel, vp + ' ' + path, 'fkm-%s%s.png' % (vp, path.replace('/', '-')))
@@ -77,12 +99,12 @@ with sync_playwright() as p:
         # ---- Dekan: semua jabatan, tiada menu admin
         login(pg, 'user1@demo.local')
         visit(pg, '/fkm/staf', '[data-tbl] tr[data-sid]', vp + ' dekan direktori')
-        assert pg.locator('[data-tbl] tr[data-sid]').count() == 35, 'Dekan nampak semua staf aktif (35)'
+        assert pg.locator('[data-tbl] tr[data-sid]').count() >= 35, 'Dekan nampak semua staf aktif (35 demo + staf E2E)'
         assert pg.locator('a[href="#/fkm/capaian"], a[href="#/fkm/cv"], a[href="#/admin"]').count() == 0, 'tiada menu admin'
         pg.click('[data-tbl] tr[data-sid] td:first-child'); pg.wait_for_selector('.fk-modal:not(.hidden) .fk-ring')
-        assert pg.locator('.fk-modal a[href*="/sunting"]').count() == 0
+        assert pg.locator('.fk-modal [data-act="fk-edit"]').count() == 0
         pg.goto(B + '#/fkm/capaian'); pg.wait_for_timeout(800); assert '#/utama' in pg.url, 'dekan dihalang dari User Access Control'
-        step(vp + ': dekan nampak 35 staf aktif, tiada butang sunting / menu admin')
+        step(vp + ': dekan nampak semua staf aktif, tiada butang sunting / menu admin')
 
         # ---- Ketua Jabatan KBPI
         login(pg, 'user0@demo.local')

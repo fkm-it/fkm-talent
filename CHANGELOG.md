@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## FKM Talent 0.3.0 — 2026-10-21
+- Halaman log masuk / daftar / lupa kata laluan gaya lama (kad "FKM · Academic Talent & Career Intelligence Dashboard"); halaman pemasaran templat diganti terus ke log masuk.
+- Borang Sunting & Tambah Staf bertab dalam modal (A. Profil, B. Penyelidikan & Geran, C. Pengajaran, Penyeliaan & Latihan, D. Khidmat, Anugerah & LPPT): kepala & kaki melekat, serlahan medan diubah, kiraan perubahan per tab, Undur Semua, amaran keluar tanpa simpan, tanda CV!/CV (medan yang ditimpa Auto-Extract), Staff ID dikunci, hanya medan diubah dihantar.
+- Teras templat (generik): `KD.authShell()` untuk rupa halaman pengesahan.
+
 ## FKM Talent 0.2.0 — 2026-10-21
 Antara muka sistem lama dikekalkan di platform baharu.
 - Shell FKM (sidebar, topbar, footer) dan 12 halaman yang sama seperti sistem lama: Executive Dashboard, Staff Profile, Promotion Readiness, Training Intelligence, Research Performance, Grant Management, Supervision, Khidmat & Perundingan, MyRA Audit Score, Auto-Extract CV, AI Career Advisor, User Access Control (+ Import Sistem Lama untuk Super Admin).

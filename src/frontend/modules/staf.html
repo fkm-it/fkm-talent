@@ -154,6 +154,59 @@ color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI
 .fk-ask-row button{padding:12px 14px}
 }
 @media print{.fk-sidebar,.fk-topbar,.fk-foot,.fk-toolbar{display:none!important}.fk-main{margin-left:0}}
+
+/* ----- Log masuk gaya lama ----- */
+#toasts{z-index:260}
+.fk-login{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--bg);background-image:radial-gradient(1100px 600px at 8% -8%,var(--brand-soft),transparent 60%),radial-gradient(900px 520px at 100% 0%,rgba(123,91,214,.10),transparent 55%)}
+.fk-login .fk-login-card.auth-card{background:var(--surface);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow-lg);padding:40px;width:100%;max-width:440px;text-align:center;margin:0}
+.fk-login-logo{width:62px;height:62px;margin:0 auto 18px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;font-weight:800;font-size:19px;letter-spacing:.5px;box-shadow:0 10px 26px rgba(30,95,216,.36)}
+.fk-login h1{font-size:22px;line-height:1.35;letter-spacing:-.4px;margin:0 0 8px;color:var(--text);font-family:inherit}
+.fk-login-sub{color:var(--muted);font-size:13px;margin:0 0 22px}
+.fk-login-step{font-size:13px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.8px;margin:0 0 2px}
+.fk-login-stepsub{font-size:12.5px;color:var(--faint);margin:0 0 8px}
+.fk-login form{text-align:left}
+.fk-login .field{margin:0}
+.fk-login .label{display:block;text-align:left;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:14px 0 7px}
+.fk-login .input{width:100%;padding:12px 14px;border-radius:11px;border:1px solid var(--border);background:var(--surface-solid);color:var(--text);font-size:14px;font-family:inherit;outline:none;height:auto}
+.fk-login .input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.fk-login .input-group{position:relative}
+.fk-login .input-group .input{padding-right:46px}
+.fk-login .input-group .icon-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%)}
+.fk-login .check{font-size:12.5px;color:var(--muted);margin-top:14px}
+.fk-login .hint{font-size:11.5px;color:var(--faint)}
+.fk-login .req{color:var(--red)}
+.fk-login .field-error{color:var(--red);font-size:12px;margin-top:5px}
+.fk-login .field.has-error .input{border-color:var(--red)}
+.fk-login .btn-primary,.fk-login .btn-outline{width:100%;margin-top:22px;padding:13px;border-radius:11px;font-size:14px;font-weight:650;border:none;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;box-shadow:0 8px 22px rgba(30,95,216,.32);transition:.2s;justify-content:center;min-height:0}
+.fk-login .btn-primary:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(30,95,216,.42)}
+.fk-login .auth-links{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:18px;font-size:12.5px}
+.fk-login .auth-links a{color:var(--brand);text-decoration:none;font-weight:600}
+.fk-login-note{margin:20px 0 0;font-size:11px;color:var(--faint);line-height:1.6}
+@media(max-width:640px){.fk-login .fk-login-card.auth-card{padding:28px 20px}}
+/* ----- Borang sunting profil bertab (gaya lama) ----- */
+.fk-modal-body.wide{max-width:1140px;padding:0;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
+.fk-ef-head{padding:20px 24px 0;border-bottom:1px solid var(--border);flex-shrink:0}
+.fk-ef-head .fk-modal-close{margin:0 0 0 8px}
+.fk-ef-tabs{display:flex;gap:6px;margin-top:14px;overflow-x:auto}
+.fk-ef-tab{padding:9px 16px;border-radius:10px 10px 0 0;font-size:12.5px;font-weight:650;background:transparent;color:var(--muted);border:1px solid transparent!important;border-bottom:none!important;white-space:nowrap}
+.fk-ef-tab.on{background:var(--brand-soft);color:var(--brand);border-color:var(--border)!important}
+.fk-ef-scroll{padding:18px 24px;overflow-y:auto;flex:1}
+.fk-ef-foot{padding:13px 24px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;background:var(--surface-solid);flex-wrap:wrap}
+.fk-ef-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:13px 16px}
+.fk-ef-grid .w2{grid-column:span 2}
+.fk-ef-f label{display:block;margin:0 0 6px;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.fk-modal .fk-ef-f input:not([type=checkbox]),.fk-modal .fk-ef-f select{width:100%;padding:9px 11px;font-size:12.5px;border-radius:9px;border:1px solid var(--border);background:var(--surface-solid);color:var(--text);font-family:inherit;outline:none}
+.fk-modal .fk-ef-f input[readonly]{background:var(--brand-soft);color:var(--muted)}
+.fk-ef-f input[type=checkbox]{width:auto}
+.fk-ef-f.changed input,.fk-ef-f.changed select{border-color:var(--amber);background:rgba(232,163,23,.08)}
+.fk-ef-f.changed label{color:#b77a00}
+.fk-ef-f.changed label::after{content:' •';color:var(--amber)}
+.fk-ef-f.err input,.fk-ef-f.err select{border-color:var(--red)}
+.fk-ef-f .fk-ef-msg{color:var(--red);font-size:11px;margin-top:4px}
+.fk-ef-cv{display:inline-block;margin-left:5px;padding:1px 5px;border-radius:5px;font-size:9px;font-weight:800;letter-spacing:.3px;background:rgba(232,163,23,.2);color:#b77a00;vertical-align:middle;cursor:help}
+.fk-ef-cv.always{background:rgba(224,79,79,.18);color:var(--red)}
+.fk-ef-sec{grid-column:1/-1;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--faint);margin:10px 0 0;padding-bottom:6px;border-bottom:1px solid var(--border)}
+@media(max-width:760px){.fk-ef-grid .w2{grid-column:span 1}.fk-modal-body.wide{max-height:96vh}.fk-ef-head,.fk-ef-scroll,.fk-ef-foot{padding-left:14px;padding-right:14px}.fk-ef-grid{grid-template-columns:1fr}}
 </style>
 <script>
 /**
@@ -333,15 +386,20 @@ color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI
       const old = qs('[data-fk-modal-body]', m);
       const body = old.cloneNode(false);
       old.replaceWith(body);
-      body.className = 'fk-modal-body' + (narrow ? ' narrow' : '');
-      body.innerHTML = html`<button class="fk-modal-close" data-act="fk-close" aria-label="Tutup">×</button>${content}`.s;
+      const wide = narrow === 'wide';
+      body.className = 'fk-modal-body' + (wide ? ' wide' : narrow ? ' narrow' : '');
+      body.innerHTML = wide ? html`${content}`.s : html`<button class="fk-modal-close" data-act="fk-close" aria-label="Tutup">×</button>${content}`.s;
+      modal.guard = null;
       m.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
       const f = qs('[data-autofocus]', body) || qs('.fk-modal-close', body);
       if (f) f.focus();
       return body;
     },
+    /** Tutup melainkan pengawal (cth. borang belum disimpan) membatalkan. */
+    tryClose() { if (modal.guard && !modal.guard()) return; modal.close(); },
     close() {
+      modal.guard = null;
       const m = modal.el();
       if (!m || m.classList.contains('hidden')) return;
       m.classList.add('hidden');
@@ -349,7 +407,7 @@ color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI
       document.body.style.overflow = '';
     }
   };
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.tryClose(); });
 
   function openPasswordModal() {
     const b = modal.show(html`<div class="fk-card-title" style="font-size:17px">Tukar Kata Laluan</div><div class="fk-card-sub">Minimum 8 aksara, gabungan huruf dan nombor. Sesi pada peranti lain akan ditamatkan.</div>
@@ -405,8 +463,8 @@ color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI
       on(app, 'click', '.fk-nav-item', () => sidebar.classList.remove('open'));
       on(app, 'click', '[data-act="fk-pw"]', openPasswordModal);
       on(app, 'click', '[data-act="fk-refresh"]', () => { fkm.invalidate(); KD.router.render(); });
-      on(app, 'click', '[data-act="fk-close"]', () => modal.close());
-      on(app, 'click', '[data-fk-modal]', (e, m) => { if (e.target === m) modal.close(); });
+      on(app, 'click', '[data-act="fk-close"]', () => modal.tryClose());
+      on(app, 'click', '[data-fk-modal]', (e, m) => { if (e.target === m) modal.tryClose(); });
       on(app, 'click', '[data-act="fk-theme"]', () => {
         const t = app.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         app.setAttribute('data-theme', t); setTheme(t);
@@ -514,13 +572,14 @@ color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI
   /** Butang pentadbir pada profil (sunting, nyahaktif / lantik semula). */
   function adminBar(s, d) {
     if (d.access.peranan !== 'ADMIN') return '';
-    return html`<div class="fk-btn-row"><a class="fk-btn" href="#/admin/staf/${s.id}/sunting">✎ Sunting Maklumat</a>
+    return html`<div class="fk-btn-row"><button class="fk-btn" data-act="fk-edit" data-id="${s.id}">✎ Sunting Maklumat</button>
       ${s.aktif ? html`<button class="fk-btn danger" data-act="fk-deact" data-id="${s.id}">⛔ Nyahaktifkan Staf</button>` : html`<button class="fk-btn" data-act="fk-react" data-id="${s.id}">↻ Lantik Semula</button>`}
       <a class="fk-btn" href="#/admin/staf/${s.id}">☷ Rekod &amp; Audit</a></div>
       ${s.aktif ? '' : html`<div class="fk-alert red">Rekod ini <strong>tidak aktif</strong> (status: ${s.status}). Ia dikecualikan daripada semua KPI, carta dan skor kesiapsiagaan.</div>`}`;
   }
 
   function bindAdmin(root, d) {
+    on(root, 'click', '[data-act="fk-edit"]', (e, btn) => openEditor(btn.getAttribute('data-id')));
     on(root, 'click', '[data-act="fk-deact"]', (e, btn) => {
       const s = d.staff.filter((x) => x.id === btn.getAttribute('data-id'))[0];
       if (!s) return;
@@ -547,6 +606,151 @@ color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI
         KD.router.render();
       } catch (err) { toastError(err); }
     });
+  }
+
+
+  /* ================================================================ BORANG SUNTING / TAMBAH STAF BERTAB (gaya lama) */
+  const EF_TABS = [['profil', 'A. Maklumat Profil', 'staffId', 'scopusId'], ['penyelidikan', 'B. Penyelidikan & Geran', 'pub', 'dana'],
+    ['ajar', 'C. Pengajaran, Penyeliaan & Latihan', 'phdSelia', 'latihanProfesional'], ['khidmat', 'D. Khidmat, Anugerah & LPPT', 'projekPerundingan', 'lppt2023']];
+  /* Medan yang ditulis semula oleh Auto-Extract CV (FkmImport.cvToFields): 'always' = sentiasa (dikira, walaupun 0), lain = hanya jika CV ada nilai */
+  const CV_ALWAYS = ['pub', 'geran', 'dana', 'phdSelia'];
+  const CV_IFANY = ('nama email scopusId q0 q1 q2 q3 q4 phdTamat sarjanaSelia jamAjarUg jamAjarPg geranPi projekPerundingan nilaiPerundingan anugerahAntarabangsa ' +
+    'anugerahKebangsaan anugerahUtm jkAntarabangsa jkKebangsaan jkUniversiti jkFakulti vivaDalaman vivaLuar hakCipta pengerusiSesi lppt2025 lppt2024 lppt2023').split(' ');
+  const EF_WIDE = ['nama', 'bidangKepakaran', 'nicheArea', 'researchAlliance', 'rgNama'];
+  const EF_SEC = { staffId: 'Identiti', jabatan: 'Jawatan', kelayakan: 'Kepakaran & Penyelidikan', statusPerkhidmatan: 'Perkhidmatan', pub: 'Penerbitan', pub2020: 'Trend penerbitan tahunan',
+    geran: 'Geran', phdSelia: 'Penyeliaan', jamAjarUg: 'Pengajaran', jamLatihan: 'Latihan', projekPerundingan: 'Perundingan & khidmat akademik', jkAntarabangsa: 'Jawatankuasa',
+    anugerahAntarabangsa: 'Anugerah & harta intelek', lppt2025: 'LPPT' };
+
+  const efStr = (f, v) => (f.type === 'bool' ? String(v === true || String(v).toUpperCase() === 'TRUE') : v === null || v === undefined ? '' : String(v));
+  function efField(f, v, isAdd) {
+    const val = efStr(f, v);
+    const cv = CV_ALWAYS.indexOf(f.key) >= 0 ? html`<span class="fk-ef-cv always" title="Auto-Extract CV SENTIASA menulis semula medan ini (walaupun 0) — suntingan manual pasti hilang.">CV!</span>`
+      : CV_IFANY.indexOf(f.key) >= 0 ? html`<span class="fk-ef-cv" title="Auto-Extract CV menulis semula medan ini HANYA jika CV mengandungi nilainya.">CV</span>` : '';
+    const id = 'ef_' + f.key;
+    const label = html`<label for="${id}">${f.label}${f.required ? ' *' : ''}${cv}</label>`;
+    let input;
+    if (f.type === 'enum') {
+      /* Kekalkan nilai sedia ada walaupun di luar senarai — jangan "membetulkan" data secara senyap */
+      const opts = (f.options || []).slice();
+      if (val && !opts.some((o) => o.value === val)) opts.unshift({ value: val, label: val });
+      input = html`<select id="${id}" data-ef="${f.key}">${f.required && val ? '' : html`<option value="">—</option>`}${opts.map((o) => html`<option value="${o.value}" ${o.value === val ? raw('selected') : ''}>${o.label}</option>`)}</select>`;
+    } else if (f.type === 'bool') {
+      input = html`<label class="fk-check" style="text-transform:none;letter-spacing:0;font-weight:500;font-size:12.5px"><input type="checkbox" id="${id}" data-ef="${f.key}" ${val === 'true' ? raw('checked') : ''}> Ya</label>`;
+    } else {
+      const num = f.type === 'int' || f.type === 'number';
+      /* Pemilih tarikh hanya jika nilai benar-benar YYYY-MM-DD (format lain dipapar kosong dan boleh terpadam) */
+      const type = num ? 'number' : f.type === 'email' ? 'email' : f.type === 'date' && (!val || /^\d{4}-\d{2}-\d{2}$/.test(val)) ? 'date' : 'text';
+      const lock = f.key === 'staffId' && !isAdd;
+      input = html`<input id="${id}" data-ef="${f.key}" type="${type}" value="${val}" ${num ? raw('step="any" min="0"') : raw('placeholder="—"')} ${lock ? raw('readonly title="Staff ID ialah kunci utama dan tidak boleh diubah"') : ''}>`;
+    }
+    return html`${EF_SEC[f.key] ? html`<div class="fk-ef-sec">${EF_SEC[f.key]}</div>` : ''}<div class="fk-ef-f ${EF_WIDE.indexOf(f.key) >= 0 ? 'w2' : ''}" data-key="${f.key}">${label}${input}</div>`;
+  }
+
+  async function openEditor(id) {
+    const meta = KD.moduleOf('staf');
+    if (!meta) return toast('Metadata modul staf tiada. Muat semula halaman.', 'error');
+    const isAdd = !id;
+    const fields = meta.fields.filter((f) => !f.readonly);
+    let values = {}, dto = null;
+    if (!isAdd) {
+      modal.show(html`<div style="padding:26px"><button class="fk-modal-close" data-act="fk-close" style="float:right">×</button><div class="fk-card-title">Sunting Maklumat Staf</div><p class="fk-mini">Memuatkan data terkini daripada pangkalan data…</p></div>`, 'wide');
+      try { dto = await KD.api.get('staf', id); values = dto.values || {}; } catch (err) { toastError(err); modal.close(); return; }
+    }
+    const orig = {};
+    fields.forEach((f) => { orig[f.key] = efStr(f, values[f.key]); });
+    const tabOf = {};
+    const panels = EF_TABS.map((t) => {
+      const a = fields.findIndex((f) => f.key === t[2]), b = fields.findIndex((f) => f.key === t[3]);
+      const list = fields.slice(a, b + 1);
+      list.forEach((f) => { tabOf[f.key] = t[0]; });
+      return [t, list];
+    });
+    fields.forEach((f) => { if (!tabOf[f.key]) { tabOf[f.key] = 'profil'; panels[0][1].push(f); } });
+    const legend = html`<p class="fk-mini" style="margin:4px 0 14px;line-height:1.8"><span class="fk-ef-cv always">CV!</span> Auto-Extract CV <strong>sentiasa</strong> menulis semula medan ini — suntingan manual pasti hilang bila CV diekstrak semula. &nbsp; <span class="fk-ef-cv">CV</span> Ditulis semula <strong>hanya jika</strong> CV mengandungi nilainya. &nbsp; Medan tanpa tanda tidak pernah disentuh Auto-Extract CV.</p>`;
+    const b = modal.show(html`<div class="fk-ef-head"><button class="fk-modal-close" data-act="fk-close" aria-label="Tutup" style="float:right">×</button>
+        <div class="fk-card-title" style="margin-bottom:4px;font-size:16px">${isAdd ? 'Tambah Staf Baharu' : 'Sunting Maklumat Staf'}</div>
+        <p class="fk-mini" style="margin:0">${isAdd ? 'Medan bertanda * wajib (Staff ID, Nama, Jabatan). Staf yang CVnya belum ada boleh ditambah di sini; kemudian kemas kini melalui Auto-Extract CV.'
+          : html`${values.nama || ''} · Staff ID <strong>${values.staffId || ''}</strong> · Staff ID ialah kunci utama dan tidak boleh diubah${values.sumberData ? ' · Sumber: ' + values.sumberData : ''}${values.cvDikemaskini ? ' · CV ' + values.cvDikemaskini : ''}`}</p>
+        <div class="fk-ef-tabs" role="tablist">${panels.map((p, i) => html`<button class="fk-ef-tab ${i ? '' : 'on'}" role="tab" data-tab="${p[0][0]}" data-base="${p[0][1]}">${p[0][1]}</button>`)}</div></div>
+      <div class="fk-ef-scroll" data-ef-scroll>${panels.map((p, i) => html`<div data-panel="${p[0][0]}" class="${i ? 'hidden' : ''}">
+          ${i ? html`<div class="fk-alert">⚠️ <strong>Ditimpa bermaksud DIGANTI, bukan ditambah.</strong> Auto-Extract CV menulis nilai baharu terus ke atas nilai sedia ada — tiada apa yang terkumpul atau berganda. Tanda pada label menunjukkan medan yang terjejas.</div>`
+            : html`<p class="fk-mini" style="margin:0 0 2px">Kebanyakan medan di sini selamat disunting — tiada proses lain menulis kepadanya, kecuali yang bertanda.</p>`}${legend}
+          <div class="fk-ef-grid">${p[1].map((f) => efField(f, values[f.key], isAdd))}</div></div>`)}
+        <p class="fk-mini" data-ef-err style="color:var(--red);margin:14px 0 0;min-height:14px"></p></div>
+      <div class="fk-ef-foot"><span class="fk-mini" data-ef-count style="color:var(--faint)">${isAdd ? 'Belum ada medan diisi' : 'Tiada perubahan'}</span><span style="flex:1"></span>
+        <button class="fk-btn" data-act="ef-reset" disabled>Undur Semua</button><button class="fk-btn" data-act="fk-close">Keluar</button>
+        <button class="fk-btn-primary" data-act="ef-save">${isAdd ? 'Tambah Staf' : 'Simpan Perubahan'}</button></div>`, 'wide');
+    if (!b) return;
+    const cur = (el) => (el.type === 'checkbox' ? String(el.checked) : el.value);
+    let dirty = 0;
+    const changed = () => {
+      const count = {};
+      qsa('[data-ef]', b).forEach((el) => {
+        const k = el.getAttribute('data-ef');
+        const isDirty = String(cur(el)) !== String(orig[k] || (el.type === 'checkbox' ? 'false' : ''));
+        el.closest('.fk-ef-f').classList.toggle('changed', isDirty);
+        if (isDirty) count[tabOf[k]] = (count[tabOf[k]] || 0) + 1;
+      });
+      dirty = Object.keys(count).reduce((t, k) => t + count[k], 0);
+      const c = qs('[data-ef-count]', b);
+      c.textContent = isAdd ? (dirty ? dirty + ' medan diisi' : 'Belum ada medan diisi') : (dirty ? dirty + ' perubahan belum disimpan' : 'Tiada perubahan');
+      c.style.color = dirty ? '#b77a00' : 'var(--faint)';
+      c.style.fontWeight = dirty ? '700' : '400';
+      qsa('.fk-ef-tab', b).forEach((t) => { const n = count[t.getAttribute('data-tab')]; t.textContent = t.getAttribute('data-base') + (n ? ' (' + n + ')' : ''); });
+      qs('[data-act="ef-reset"]', b).disabled = !dirty;
+    };
+    const showTab = (t) => {
+      qsa('.fk-ef-tab', b).forEach((x) => x.classList.toggle('on', x.getAttribute('data-tab') === t));
+      qsa('[data-panel]', b).forEach((x) => x.classList.toggle('hidden', x.getAttribute('data-panel') !== t));
+      qs('[data-ef-scroll]', b).scrollTop = 0;
+    };
+    modal.guard = () => !dirty || window.confirm(isAdd ? 'Maklumat yang diisi belum disimpan.\n\nKeluar dan buang maklumat tersebut?' : dirty + ' perubahan belum disimpan.\n\nKeluar dan buang perubahan tersebut?');
+    on(b, 'input', '[data-ef]', changed);
+    on(b, 'change', '[data-ef]', changed);
+    on(b, 'click', '.fk-ef-tab', (e, t) => showTab(t.getAttribute('data-tab')));
+    on(b, 'click', '[data-act="ef-reset"]', () => {
+      if (!window.confirm('Undur semua ' + dirty + ' perubahan dan kembali kepada nilai asal?')) return;
+      qsa('[data-ef]', b).forEach((el) => { const v = orig[el.getAttribute('data-ef')] || ''; if (el.type === 'checkbox') el.checked = v === 'true'; else el.value = v; });
+      qs('[data-ef-err]', b).textContent = '';
+      changed();
+    });
+    on(b, 'click', '[data-act="ef-save"]', (e, btn) => {
+      const patch = {};
+      qsa('[data-ef]', b).forEach((el) => {
+        const k = el.getAttribute('data-ef');
+        if (String(cur(el)) === String(orig[k] || (el.type === 'checkbox' ? 'false' : ''))) return;
+        const f = fields.filter((x) => x.key === k)[0];
+        const v = cur(el);
+        patch[k] = f.type === 'bool' ? v === 'true' : (f.type === 'int' || f.type === 'number') && String(v).trim() !== '' ? Number(v) : String(v).trim();
+      });
+      qsa('.fk-ef-f.err', b).forEach((x) => { x.classList.remove('err'); const m = qs('.fk-ef-msg', x); if (m) m.remove(); });
+      const errEl = qs('[data-ef-err]', b);
+      if (!Object.keys(patch).length) { errEl.textContent = isAdd ? 'Isi sekurang-kurangnya Staff ID, Nama dan Jabatan.' : 'Tiada perubahan untuk disimpan.'; return; }
+      KD.ui.busy(btn, async () => {
+        try {
+          if (isAdd) await KD.api.create('staf', Object.assign(patch, { requestId: 'ef' + Date.now() }));
+          else await KD.api.update('staf', id, patch);
+          fkm.invalidate(); modal.close();
+          toast(isAdd ? 'Staf baharu ditambah.' : 'Maklumat staf disimpan.');
+          KD.router.render();
+        } catch (err) {
+          errEl.textContent = (err && err.message) || 'Gagal menyimpan.';
+          const fe = err && err.meta && err.meta.fields;
+          if (fe) {
+            let first = null;
+            Object.keys(fe).forEach((k) => {
+              const box = qs('.fk-ef-f[data-key="' + k + '"]', b);
+              if (!box) return;
+              box.classList.add('err');
+              const m = document.createElement('div'); m.className = 'fk-ef-msg'; m.textContent = fe[k]; box.appendChild(m);
+              if (!first) first = k;
+            });
+            if (first) showTab(tabOf[first]);
+          }
+        }
+      });
+    });
+    changed();
   }
 
   function openProfile(d, sid) {
@@ -599,7 +803,7 @@ color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI
         <select data-f="jabatan" aria-label="Jabatan"><option value="">Semua Jabatan</option>${dl(base).map((x) => html`<option value="${x}">${x}</option>`)}</select>
         <select data-f="jawatan" aria-label="Gred"><option value="">Semua Gred</option>${ranks.map((x) => html`<option value="${x}">${x}</option>`)}</select>
         <select data-f="khidmat" aria-label="Status"><option value="">Semua Status</option>${stats.map((x) => html`<option value="${x}">${x}</option>`)}</select>
-        ${d.access.peranan === 'ADMIN' ? html`<a class="fk-btn-primary fk-btn-block" href="#/admin/staf/baru">+ Tambah Staf</a>` : ''}</div>
+        ${d.access.peranan === 'ADMIN' ? html`<button class="fk-btn-primary fk-btn-block" data-act="fk-add">+ Tambah Staf</button>` : ''}</div>
       ${off ? html`<div class="fk-mini fk-inline" style="margin:-6px 0 14px"><label class="fk-check"><input type="checkbox" data-off ${SHOW_OFF ? raw('checked') : ''}><span>Tunjuk staf tidak aktif</span></label>
         <span class="fk-badge b-grey">${off} tidak aktif ${SHOW_OFF ? '(sedang dipaparkan)' : 'disembunyikan'}</span></div>` : ''}
       <div class="fk-card"><div class="fk-card-title">Direktori Staf Akademik</div><div class="fk-card-sub" data-count></div><div data-tbl></div></div>`.s;
@@ -616,6 +820,7 @@ color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI
     on(w, 'input', '[data-q]', debounce(draw, 150));
     on(w, 'change', '[data-f]', draw);
     on(w, 'change', '[data-off]', (e, c) => { SHOW_OFF = c.checked; KD.router.render(); });
+    on(w, 'click', '[data-act="fk-add"]', () => openEditor(null));
     draw();
   });
 
@@ -1140,6 +1345,24 @@ function extractCVfields(fullRaw){
       });
     });
   }, { roles: ['ADMIN'], allowEmpty: true });
+
+
+  /* ================================================================ LOG MASUK GAYA LAMA (KD.authShell — borang templat dikekalkan) */
+  KD.authShell = (title, subtitle, body, links) => html`<div class="fk fk-login" data-theme="${getTheme()}"><div class="fk-login-card auth-card">
+      <div class="fk-login-logo">FKM</div><h1>Academic Talent &amp; Career<br>Intelligence Dashboard</h1>
+      <p class="fk-login-sub">Fakulti Kejuruteraan Mekanikal · Universiti Teknologi Malaysia</p>
+      ${title !== 'Log Masuk' ? html`<p class="fk-login-step">${title}</p><p class="fk-login-stepsub">${subtitle}</p>` : ''}
+      ${body}${links ? html`<div class="auth-links">${links}</div>` : ''}
+      <p class="fk-login-note">${title === 'Log Masuk' ? 'Log masuk guna e-mel UTM & kata laluan anda. Kali pertama? Daftar dengan e-mel UTM yang disenaraikan oleh Unit IT FKM.' : 'Hanya e-mel UTM dalam senarai capaian boleh mendaftar.'}</p></div></div>`;
+  const tweakAuth = (view, fn) => { const orig = KD.views[view]; if (!orig) return; KD.views[view] = { async render(el, p, q) { await orig.render(el, p, q); fn(el); } }; };
+  tweakAuth('login', (el) => {
+    const i = qs('#f-email', el), l = qs('label[for="f-email"]', el);
+    if (i) i.placeholder = 'nama@utm.my';
+    if (l) l.textContent = 'E-mel UTM';
+  });
+  tweakAuth('register', (el) => { const i = qs('#f-email', el); if (i) i.placeholder = 'nama@utm.my'; });
+  /* Tiada halaman pemasaran: terus ke log masuk (atau dashboard jika sudah log masuk) */
+  KD.views.landing = { render() { KD.router.go(KD.auth.loggedIn() ? '/utama' : '/log-masuk', true); } };
 
   /* ================================================================ LALUAN */
   const VIEW = { '/fkm/staf': 'fkmStaf', '/fkm/kenaikan': 'fkmKenaikan', '/fkm/latihan': 'fkmLatihan', '/fkm/penyelidikan': 'fkmPenyelidikan', '/fkm/geran': 'fkmGeran',

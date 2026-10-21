@@ -15,7 +15,7 @@ const CONFIG = Object.freeze({
   APP_SLUG: 'FkmTalent', // @init:slug
   /** Warna jenama (email, dsb.). */
   BRAND_COLOR: '#1E5FD8', // @init:brandColor
-  VERSION: '0.2.0',
+  VERSION: '0.3.0',
   TIMEZONE_FALLBACK: 'Asia/Kuala_Lumpur',
 
   DEFAULT_PAGE_SIZE: 20,

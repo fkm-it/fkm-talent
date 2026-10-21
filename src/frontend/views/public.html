@@ -102,6 +102,8 @@
 
   // ---------------------------------------------------------------- Auth
   function authShell(title, subtitle, body, links) {
+    /* Projek boleh menggantikan rupa halaman log masuk/daftar/lupa: KD.authShell(title, subtitle, body, links) → html`` */
+    if (KD.authShell) return KD.authShell(title, subtitle, body, links);
     return html`${publicTop(false)}<main class="auth"><div class="auth-card">
       <div class="auth-card__head">${star()}<h1 style="font-size:var(--fs-2xl)">${title}</h1><p>${subtitle}</p></div>
       ${body}${links ? html`<div class="auth-links">${links}</div>` : ''}</div></main>`;
