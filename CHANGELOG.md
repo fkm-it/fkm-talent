@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## FKM Talent 0.2.0 — 2026-10-21
+Antara muka sistem lama dikekalkan di platform baharu.
+- Shell FKM (sidebar, topbar, footer) dan 12 halaman yang sama seperti sistem lama: Executive Dashboard, Staff Profile, Promotion Readiness, Training Intelligence, Research Performance, Grant Management, Supervision, Khidmat & Perundingan, MyRA Audit Score, Auto-Extract CV, AI Career Advisor, User Access Control (+ Import Sistem Lama untuk Super Admin).
+- Kad KPI, carta Chart.js 4.4.1 (salinan tempatan, dimuat malas), profil dalam modal, Dark Mode, Tukar Kata Laluan.
+- Semua peranan mendarat di Executive Dashboard (staf → profil sendiri). Panel pentadbir templat kekal di menu "Panel Pentadbir".
+- User Access Control: senarai capaian + status akaun (laluan baharu `staf.akses`), tukar peranan/skop/status terus dalam jadual, tambah pengguna, pautan reset, audit log.
+- Teras templat (generik): `KD.shells[<layout>]` (shell tersuai), `KD.home()` (laman selepas log masuk), pemilih laman utama boleh ditetapkan dalam `tools/e2e-values.json` (`_e2e`).
+
 ## FKM Talent 0.1.1 — 2026-10-21
 - Pengekstrak CV: markah LPPT hanya diambil terus selepas label `LPPT Marks (3 years)` dan mesti 0–100. Sebelum ini (warisan sistem lama) CV tanpa markah LPPT tersalah ambil nombor lain (cth. tahun 2024) dan staf itu "lulus" gatekeeper LPPT.
 

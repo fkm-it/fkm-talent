@@ -61,7 +61,7 @@ Pengguna (Za) biasanya hanya memberi **penerangan atau mockup**, contohnya "Saya
 
 ## Projek ini: FKM Talent Intelligence
 
-- Domain: `src/domain/Fkm*.gs` (konfigurasi skor, enjin skor, RBAC DEAN/HOD/STAFF, set data bercache, import/CV), hooks `src/modules/staf|capaian`, paparan `src/frontend/modules/staf.html`.
+- Domain: `src/domain/Fkm*.gs` (konfigurasi skor, enjin skor, RBAC DEAN/HOD/STAFF, set data bercache, import/CV), hooks `src/modules/staf|capaian`, paparan `src/frontend/modules/staf.html` (shell sendiri `KD.shells.app` — rupa sistem lama dikekalkan atas permintaan Za; jangan tukar kepada shell templat).
 - Formula skor HANYA dalam `FkmScoring.gs` — jangan salin ke frontend. Benchmark: tetapan `FKM_SKOR` (JSON), bukan kod.
 - Data staf sebenar & PDF CV **tidak boleh** masuk repo (repo awam). Data demo dalam `tools/seed-custom.js` mesti rekaan.
 - Selepas ubah paparan FKM: `npm run dev` + `npm run e2e:fkm` (pelayan baharu; `e2e.py` menyekat akaun demo).

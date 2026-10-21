@@ -43,6 +43,9 @@ const StafHooks = {
     /** Set data dashboard, ditapis mengikut capaian peminta. */
     'staf.data': { role: 'USER', fn: function (payload, ctx) { return FkmData.scoped(ctx); } },
 
+    /** Senarai capaian + status akaun (User Access Control). */
+    'staf.akses': { role: 'ADMIN', fn: function () { return { items: FkmAccess.overview() }; } },
+
     /** Simpan hasil Auto-Extract CV (pentadbir). */
     'staf.cvSave': {
       role: 'ADMIN',

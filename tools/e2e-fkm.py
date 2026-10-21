@@ -17,7 +17,7 @@ def login(pg, email):
     pg.evaluate('localStorage.clear();sessionStorage.clear()')
     pg.goto(B + '#/log-masuk'); pg.reload(); pg.wait_for_selector('#f-email')
     pg.fill('#f-email', email); pg.fill('#f-password', 'Demo1234'); pg.click('button[type=submit]')
-    pg.wait_for_function('location.hash.indexOf("log-masuk") < 0', timeout=20000); pg.wait_for_selector('#view.content')
+    pg.wait_for_function('location.hash.indexOf("log-masuk") < 0', timeout=20000); pg.wait_for_selector('#view.content'); pg.wait_for_timeout(300)
 
 def no_hscroll(pg, tag):
     w = pg.evaluate('document.documentElement.scrollWidth - document.documentElement.clientWidth')
@@ -36,53 +36,71 @@ with sync_playwright() as p:
         pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.goto(B); pg.wait_for_load_state('networkidle')
 
-        # ---- Pentadbir (Super Admin)
+        # ---- Pentadbir (Super Admin): 13 halaman rupa sistem lama
         login(pg, 'super@demo.local')
-        visit(pg, '/utama', '.stat', vp + ' admin ringkasan', 'fkm-%s-1-ringkasan.png' % vp)
-        assert pg.locator('.chart').count() >= 2 and pg.locator('.fkm-donut').count() >= 1
-        visit(pg, '/admin/fkm/staf', '[data-rows] tr', vp + ' admin direktori', 'fkm-%s-2-direktori.png' % vp)
-        n_all = pg.locator('[data-rows] tr').count()
+        assert '#/utama' in pg.url, 'admin mendarat di Executive Dashboard'
+        visit(pg, '/utama', '.fk-kpi', vp + ' admin executive', 'fkm-%s-1-executive.png' % vp)
+        pg.wait_for_function('document.querySelectorAll("canvas[data-chart]").length >= 5 && !!window.Chart', timeout=20000)
+        assert pg.locator('.fk-nav-item').count() >= 13, 'menu penuh pentadbir'
+        visit(pg, '/fkm/staf', '[data-tbl] tr[data-sid]', vp + ' admin direktori', 'fkm-%s-2-direktori.png' % vp)
+        n_all = pg.locator('[data-tbl] tr[data-sid]').count()
         pg.fill('[data-q]', 'Demo 1)'); pg.wait_for_timeout(300)
-        assert pg.locator('[data-rows] tr').count() == 1, 'carian'
+        assert pg.locator('[data-tbl] tr[data-sid]').count() == 1, 'carian'
         pg.fill('[data-q]', ''); pg.select_option('[data-f="jabatan"]', 'KBPI'); pg.wait_for_timeout(200)
-        assert 0 < pg.locator('[data-rows] tr').count() < n_all, 'penapis jabatan'
-        pg.click('[data-rows] tr a'); pg.wait_for_selector('.fkm-ring'); no_hscroll(pg, vp + ' profil')
-        assert pg.locator('.fkm-gaps li').count() >= 1 and pg.locator('a[href*="/sunting"]').count() == 1
+        assert 0 < pg.locator('[data-tbl] tr[data-sid]').count() < n_all, 'penapis jabatan'
+        pg.click('[data-tbl] tr[data-sid] td:first-child'); pg.wait_for_selector('.fk-modal:not(.hidden) .fk-ring'); no_hscroll(pg, vp + ' profil')
+        assert pg.locator('.fk-modal .fk-gap-list li').count() >= 1 and pg.locator('.fk-modal a[href*="/sunting"]').count() == 1
         pg.screenshot(path=os.path.join(SHOTS, 'fkm-%s-3-profil.png' % vp), full_page=True)
-        visit(pg, '/admin/fkm/kenaikan', '.fkm-table tbody tr', vp + ' kenaikan', 'fkm-%s-4-kenaikan.png' % vp)
-        for t in ('latihan', 'penyelidikan', 'geran', 'penyeliaan', 'khidmat', 'myra'):
-            visit(pg, '/admin/fkm/analitik?tab=' + t, '.segmented [aria-pressed="true"][data-tab="%s"]' % t, vp + ' analitik ' + t, 'fkm-%s-5-%s.png' % (vp, t) if t in ('latihan', 'penyelidikan') else None)
-        visit(pg, '/admin/fkm/penasihat', '.fkm-msg', vp + ' penasihat')
-        pg.click('[data-ask]'); pg.wait_for_function('document.querySelectorAll(".fkm-msg").length >= 3')
-        pg.fill('[data-in]', 'latihan apa perlu?'); pg.press('[data-in]', 'Enter'); pg.wait_for_function('document.querySelectorAll(".fkm-msg").length >= 5')
+        pg.keyboard.press('Escape'); pg.wait_for_selector('.fk-modal.hidden', state='attached')
+        for path, sel in (('/fkm/kenaikan', 'tr[data-sid]'), ('/fkm/latihan', 'tr[data-sid]'), ('/fkm/penyelidikan', 'tr[data-sid]'), ('/fkm/geran', 'tr[data-sid]'),
+                          ('/fkm/penyeliaan', 'tr[data-sid]'), ('/fkm/khidmat', 'tr[data-sid]'), ('/fkm/myra', 'tr[data-sid]')):
+            visit(pg, path, sel, vp + ' ' + path, 'fkm-%s%s.png' % (vp, path.replace('/', '-')))
+            assert pg.locator('.fk-nav-item.active[href="#%s"]' % path).count() == 1, 'menu aktif ' + path
+        visit(pg, '/fkm/penasihat', '.fk-msg', vp + ' penasihat')
+        pg.click('[data-ask]'); pg.wait_for_function('document.querySelectorAll(".fk-msg").length >= 3')
+        pg.fill('[data-in]', 'latihan apa perlu?'); pg.press('[data-in]', 'Enter'); pg.wait_for_function('document.querySelectorAll(".fk-msg").length >= 5')
         pg.screenshot(path=os.path.join(SHOTS, 'fkm-%s-6-penasihat.png' % vp), full_page=True)
-        visit(pg, '/admin/fkm/cv', '[data-act="pick"]', vp + ' cv')
-        visit(pg, '/admin/fkm/import', '#fkmSheet', vp + ' import')
+        visit(pg, '/fkm/capaian', '[data-ua-tbl] tr[data-id]', vp + ' capaian', 'fkm-%s-9-capaian.png' % vp)
+        assert pg.locator('[data-ua-tbl] tr[data-id]').count() >= 3
+        pg.wait_for_selector('[data-al-tbl] table')
+        visit(pg, '/fkm/cv', '[data-act="pick"]', vp + ' cv')
+        visit(pg, '/fkm/import', '#fkmSheet', vp + ' import')
+        visit(pg, '/profil', '.fk-app #view', vp + ' profil templat dalam shell FKM')
+        if pg.is_visible('[data-act="fk-menu"]'):
+            pg.click('[data-act="fk-menu"]'); pg.wait_for_timeout(400)   # telefon: sidebar dibuka melalui menu
+        pg.click('[data-act="fk-theme"]'); pg.wait_for_timeout(300)
+        assert pg.get_attribute('.fk-app', 'data-theme') == 'dark'; pg.evaluate("localStorage.removeItem('fk.theme')")
         visit(pg, '/admin/staf', '.rec-item, table', vp + ' CRUD staf')
         visit(pg, '/admin/capaian', '.rec-item, table', vp + ' CRUD capaian')
-        step(vp + ': pentadbir — semua paparan FKM')
+        step(vp + ': pentadbir — semua halaman rupa sistem lama')
 
         # ---- Dekan: semua jabatan, tiada menu admin
         login(pg, 'user1@demo.local')
-        visit(pg, '/fkm/staf', '[data-rows] tr', vp + ' dekan direktori')
-        assert pg.locator('[data-rows] tr').count() == 35, 'Dekan nampak semua staf aktif (35)'
-        assert pg.locator('a[href*="/sunting"]').count() == 0
-        step(vp + ': dekan nampak 35 staf aktif, tiada butang sunting')
+        visit(pg, '/fkm/staf', '[data-tbl] tr[data-sid]', vp + ' dekan direktori')
+        assert pg.locator('[data-tbl] tr[data-sid]').count() == 35, 'Dekan nampak semua staf aktif (35)'
+        assert pg.locator('a[href="#/fkm/capaian"], a[href="#/fkm/cv"], a[href="#/admin"]').count() == 0, 'tiada menu admin'
+        pg.click('[data-tbl] tr[data-sid] td:first-child'); pg.wait_for_selector('.fk-modal:not(.hidden) .fk-ring')
+        assert pg.locator('.fk-modal a[href*="/sunting"]').count() == 0
+        pg.goto(B + '#/fkm/capaian'); pg.wait_for_timeout(800); assert '#/utama' in pg.url, 'dekan dihalang dari User Access Control'
+        step(vp + ': dekan nampak 35 staf aktif, tiada butang sunting / menu admin')
 
         # ---- Ketua Jabatan KBPI
         login(pg, 'user0@demo.local')
-        visit(pg, '/fkm/staf', '[data-rows] tr', vp + ' hod direktori', 'fkm-%s-7-hod.png' % vp)
-        depts = pg.eval_on_selector_all('[data-rows] tr td:nth-child(2)', 'els => [...new Set(els.map(e => e.textContent.trim()))]')
+        visit(pg, '/fkm/staf', '[data-tbl] tr[data-sid]', vp + ' hod direktori', 'fkm-%s-7-hod.png' % vp)
+        depts = pg.eval_on_selector_all('[data-tbl] tr[data-sid] td:nth-child(2)', 'els => [...new Set(els.map(e => e.textContent.trim()))]')
         assert depts == ['KBPI'], 'HOD hanya KBPI: ' + str(depts)
+        assert 'HOD · KBPI' in pg.text_content('[data-fk-role]')
         step(vp + ': ketua jabatan hanya nampak KBPI')
 
         # ---- Staf: profil sendiri sahaja
         login(pg, 'user@demo.local')
-        pg.wait_for_selector('.fkm-ring'); no_hscroll(pg, vp + ' staf utama')
+        pg.wait_for_selector('.fk-ring'); no_hscroll(pg, vp + ' staf utama')
         pg.screenshot(path=os.path.join(SHOTS, 'fkm-%s-8-staf.png' % vp), full_page=True)
-        visit(pg, '/fkm/staf', '.fkm-ring', vp + ' staf → profil sendiri')
-        visit(pg, '/fkm/kenaikan', '.fkm-table tbody tr', vp + ' staf kenaikan')
-        assert pg.locator('.fkm-table tbody tr').count() == 1
+        assert pg.locator('a[href="#/utama"].fk-nav-item, a[href="#/fkm/myra"]').count() == 0, 'staf tiada Executive/MyRA'
+        visit(pg, '/fkm/staf', '.fk-ring', vp + ' staf → profil sendiri')
+        visit(pg, '/fkm/latihan', 'tr[data-sid]', vp + ' staf latihan')
+        assert pg.locator('tr[data-sid]').count() == 1
+        visit(pg, '/fkm/myra', '.fk-ring', vp + ' staf myra → profil sendiri')
         step(vp + ': staf hanya nampak profil sendiri')
 
         # ---- Auto-Extract CV dengan PDF sebenar (pilihan, tempatan)
@@ -90,12 +108,12 @@ with sync_playwright() as p:
         if cvdir and vp == 'desktop':
             pdfs = sorted(glob.glob(os.path.join(cvdir, '*.pdf')))
             login(pg, 'super@demo.local')
-            visit(pg, '/admin/fkm/cv', '[data-act="pick"]', 'cv')
+            visit(pg, '/fkm/cv', '[data-act="pick"]', 'cv')
             pg.set_input_files('[data-file]', pdfs)
             pg.wait_for_selector('[data-act="save"]', timeout=60000)
-            rows = pg.locator('.fkm-table tbody tr').count()
+            rows = pg.locator('[data-out] tbody tr').count()
             assert rows == len(pdfs), 'baris CV'
-            assert pg.locator('.badge-success').count() == len(pdfs), 'semua CV sah'
+            assert pg.locator('[data-out] .fk-badge.b-green').count() == len(pdfs), 'semua CV sah'
             pg.screenshot(path=os.path.join(SHOTS, 'fkm-cv-pratonton.png'), full_page=True)
             pg.click('[data-act="save"]'); pg.wait_for_function('document.querySelector("[data-res]").textContent.length > 0', timeout=20000)
             res = pg.text_content('[data-res]')

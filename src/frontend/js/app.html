@@ -213,14 +213,21 @@
         root.innerHTML = '<div class="public" id="view"></div>';
         return qs('#view');
       }
-      if (app.shellMode !== mode || !qs('#view')) app.renderShell(mode);
-      app.updateShell(route);
+      /* Shell tersuai projek (pilihan): KD.shells[<layout>] = { render(root, route), update(route) } — mesti ada #view */
+      const custom = KD.shells && KD.shells[mode];
+      if (custom) {
+        if (app.shellMode !== mode || !qs('#view')) { app.shellMode = mode; custom.render(root, route); }
+        custom.update(route);
+      } else {
+        if (app.shellMode !== mode || !qs('#view')) app.renderShell(mode);
+        app.updateShell(route);
+      }
       const old = qs('#view');
       const fresh = document.createElement('div');
       fresh.id = 'view';
-      fresh.className = 'content';
+      fresh.className = old.className || 'content';
       old.replaceWith(fresh);
-      qs('.main').scrollTop = 0;
+      if (qs('.main')) qs('.main').scrollTop = 0;
       return fresh;
     },
 
@@ -381,7 +388,7 @@
       const next = storage.get('kd.afterLogin');
       storage.remove('kd.afterLogin');
       app.shellMode = null;
-      router.go(next && next.indexOf('/log-masuk') < 0 ? next : (auth.isAdmin() ? '/admin' : '/utama'));
+      router.go(next && next.indexOf('/log-masuk') < 0 ? next : (KD.home ? KD.home() : (auth.isAdmin() ? '/admin' : '/utama'))); /* KD.home: laman utama projek (pilihan) */
       if (KD.pwa) KD.pwa.syncPush(); /* hidupkan semula notifikasi telefon jika pernah dipilih pada peranti ini */
     }
   };
@@ -392,6 +399,7 @@
   KD.views = KD.views || {};
   KD.extraRoutes = KD.extraRoutes || [];
   KD.extraNav = KD.extraNav || { user: [], admin: [] };
+  KD.shells = KD.shells || {};
   KD.landingCards = KD.landingCards || [];
   /** Butang tambahan di halaman butiran rekod: KD.detailActions[<modul>] = (dto, meta) => html`…` */
   KD.detailActions = KD.detailActions || {};

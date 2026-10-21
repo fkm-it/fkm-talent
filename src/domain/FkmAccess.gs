@@ -31,6 +31,23 @@ const FkmAccess = {
     return { peranan: rec.peranan, skop: String(rec.skop || ''), label: labels[rec.peranan] || rec.peranan };
   },
 
+  /**
+   * Senarai capaian + status akaun log masuk (halaman User Access Control). Satu bacaan setiap sheet.
+   * @return {Array<{id,email,nama,peranan,skop,catatan,status,akaun:?{id,status,role,lastLoginAt}}>}
+   */
+  overview: function () {
+    const users = {};
+    UserRepository.all().forEach(function (u) { users[String(u.email || '').toLowerCase()] = u; });
+    return FkmAccess.repo().all().filter(function (r) { return r.state === RECORD_STATE.ACTIVE; }).map(function (r) {
+      const u = users[String(r.email || '').toLowerCase()];
+      return {
+        id: r.id, email: String(r.email || ''), nama: String(r.nama || ''), peranan: String(r.peranan || ''), skop: String(r.skop || ''),
+        catatan: String(r.catatan || ''), status: String(r.status || ''),
+        akaun: u ? { id: u.user_id, status: u.status, role: u.role, lastLoginAt: u.last_login_at || '' } : null
+      };
+    }).sort(function (a, b) { return (a.nama || a.email).localeCompare(b.nama || b.email); });
+  },
+
   /** Tapis senarai staf mengikut capaian. */
   filter: function (list, access) {
     switch (access.peranan) {

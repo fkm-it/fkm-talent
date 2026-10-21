@@ -1,53 +1,173 @@
 <style>
-.fkm-ring { width: 120px; height: 120px; flex-shrink: 0; }
-.fkm-ring .trk { stroke: var(--line); }
-.fkm-ring text { fill: var(--ink, #0F172A); font-weight: 700; }
-.fkm-ring .sub { fill: var(--muted); font-weight: 500; }
-.fkm-score { display: flex; gap: var(--sp-6); align-items: center; flex-wrap: wrap; }
-.fkm-score > .grow { min-width: 220px; }
-.fkm-comp { margin-bottom: 10px; }
-.fkm-comp__head { display: flex; justify-content: space-between; font-size: var(--fs-sm); margin-bottom: 4px; gap: 8px; }
-.fkm-bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
-.fkm-bar > i { display: block; height: 100%; border-radius: 99px; background: var(--brand); }
-.fkm-bar > i.ok { background: #0F9D58; }
-.fkm-bar > i.warn { background: #D97706; }
-.fkm-bar > i.bad { background: #DC2626; }
-.fkm-mini { display: flex; align-items: center; gap: 8px; min-width: 110px; }
-.fkm-mini .fkm-bar { flex: 1; min-width: 50px; }
-.fkm-meta { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-.fkm-meta div { background: #F8FAFC; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; min-width: 0; }
-.fkm-meta span { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
-.fkm-meta strong { display: block; margin-top: 3px; font-size: var(--fs-sm); overflow-wrap: anywhere; }
-.fkm-gaps { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
-.fkm-gaps li { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; background: #F8FAFC; border: 1px solid var(--line); border-radius: 10px; font-size: var(--fs-sm); line-height: 1.5; }
-.fkm-gaps li .badge { flex-shrink: 0; }
-.fkm-donut { display: flex; gap: var(--sp-6); align-items: center; flex-wrap: wrap; }
-.fkm-donut svg { width: 150px; height: 150px; flex-shrink: 0; }
-.fkm-legend { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; font-size: var(--fs-sm); }
-.fkm-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; vertical-align: middle; }
-.fkm-legend .c-hijau { background: #0F9D58; } .fkm-legend .c-kuning { background: #D97706; } .fkm-legend .c-merah { background: #DC2626; }
-.fkm-legend .c-1 { background: #1E5FD8; } .fkm-legend .c-2 { background: #7C3AED; } .fkm-legend .c-3 { background: #0D9488; } .fkm-legend .c-4 { background: #94A3B8; }
-.fkm-chat { display: grid; gap: 10px; max-height: 420px; overflow-y: auto; padding: 4px 2px 12px; }
-.fkm-msg { max-width: 88%; padding: 11px 14px; border-radius: 14px; font-size: var(--fs-sm); line-height: 1.6; background: #F1F5F9; white-space: pre-line; }
-.fkm-msg.me { justify-self: end; background: var(--brand); color: #fff; }
-.fkm-row-off td { opacity: .55; }
-.fkm-note { font-size: var(--fs-sm); }
-.fkm-table td.num, .fkm-table th.num { text-align: right; white-space: nowrap; }
-.fkm-drop { border: 2px dashed var(--brand); border-radius: var(--r-lg); padding: var(--sp-6); text-align: center; background: #F8FAFF; }
-@media (max-width: 640px) { .fkm-ring { width: 104px; height: 104px; } .fkm-msg { max-width: 100%; } }
+/* ===== FKM Talent — rupa sistem lama (sidebar, kad KPI, carta Chart.js, jadual) =====
+ * Semua kelas berawalan fk- dan diskop di bawah .fk supaya tidak bertembung dengan CSS templat. */
+.fk{--bg:#eef2f9;--surface:rgba(255,255,255,.72);--surface-solid:#fff;--border:rgba(16,42,86,.10);--text:#0e1b33;--muted:#5b6b88;--faint:#8a99b5;
+--brand:#1e5fd8;--brand2:#0b3d91;--brand-soft:rgba(30,95,216,.10);--green:#0f9d58;--amber:#e8a317;--red:#dc3d3d;--purple:#7b5bd6;--teal:#0d9488;
+--shadow:0 1px 2px rgba(11,61,145,.05),0 8px 28px rgba(11,61,145,.09);--shadow-lg:0 20px 60px rgba(11,61,145,.16);--radius:16px;--sidebar:250px;
+color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.fk[data-theme="dark"]{--bg:#080d18;--surface:rgba(24,33,53,.72);--surface-solid:#141c2e;--border:rgba(255,255,255,.09);--text:#e8eefc;--muted:#93a3c0;--faint:#66799c;
+--brand:#5b8ff5;--brand2:#3b6fd4;--brand-soft:rgba(91,143,245,.14);--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.42);--shadow-lg:0 20px 60px rgba(0,0,0,.55)}
+.fk *{box-sizing:border-box}
+.fk button{font-family:inherit;cursor:pointer;border:none}
+.fk code{background:var(--brand-soft);padding:1px 5px;border-radius:4px;font-size:.9em}
+.fk-app{display:flex;min-height:100vh;background:var(--bg);background-image:radial-gradient(1100px 600px at 8% -8%,var(--brand-soft),transparent 60%),radial-gradient(900px 520px at 100% 0%,rgba(123,91,214,.10),transparent 55%);background-attachment:fixed;transition:background .3s,color .3s}
+.fk-sidebar{width:var(--sidebar);flex-shrink:0;background:var(--surface);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-right:1px solid var(--border);padding:22px 14px;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:60;overflow-y:auto}
+.fk-brand{display:flex;gap:11px;align-items:center;padding:0 8px 22px;border-bottom:1px solid var(--border);margin-bottom:16px;color:var(--text);text-decoration:none}
+.fk-brand-mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-weight:800;font-size:12px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;flex-shrink:0}
+.fk-brand strong{display:block;font-size:13.5px;letter-spacing:-.2px}
+.fk-brand span{font-size:10.5px;color:var(--faint);letter-spacing:.4px}
+.fk-nav{flex:1;display:flex;flex-direction:column;gap:2px}
+.fk-nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;color:var(--muted);font-size:13.5px;font-weight:520;text-decoration:none;transition:.16s}
+.fk-nav-item:hover{background:var(--brand-soft);color:var(--text)}
+.fk-nav-item.active{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;font-weight:620;box-shadow:0 6px 18px rgba(30,95,216,.3)}
+.fk-nav-ico{width:19px;text-align:center;font-size:15px;flex-shrink:0}
+.fk-nav-sep{margin:10px 12px 4px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--faint)}
+.fk-sidebar-foot{padding-top:14px;border-top:1px solid var(--border)}
+.fk-theme-btn{width:100%;padding:10px;border-radius:10px;background:var(--brand-soft);color:var(--text);font-size:13px;font-weight:550}
+.fk-scrim{display:none}
+.fk-main{flex:1;margin-left:var(--sidebar);display:flex;flex-direction:column;min-width:0}
+.fk-topbar{display:flex;align-items:center;gap:16px;padding:18px 28px;background:var(--surface);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.fk-title{min-width:0}
+.fk-topbar h2{font-size:19px;letter-spacing:-.4px;margin:0;color:var(--text)}
+.fk-topbar p{font-size:12.5px;color:var(--muted);margin:2px 0 0}
+.fk-hamburger{display:none;background:none;font-size:21px;color:var(--text);padding:0 4px}
+.fk-user-chip{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.fk-avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;background:linear-gradient(135deg,var(--brand),var(--purple));color:#fff;flex-shrink:0;text-decoration:none}
+.fk-user-chip strong{display:block;font-size:13px;color:var(--text)}
+.fk-user-chip span{font-size:10.5px;color:var(--faint);letter-spacing:.5px}
+.fk-logout{margin-left:8px;padding:7px 13px;border-radius:9px;background:var(--brand-soft);color:var(--brand);font-size:12px;font-weight:600}
+.fk .fk-content{max-width:none;margin:0;padding:26px 28px;flex:1;width:100%}
+.fk-foot{padding:16px 28px 26px;font-size:11.5px;color:var(--faint);border-top:1px solid var(--border)}
+.fk-foot button{background:none;color:var(--brand);font-size:11.5px;font-weight:600;padding:0}
+.fk-card{background:var(--surface);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;min-width:0}
+.fk-card-title{font-size:14px;font-weight:680;letter-spacing:-.2px;margin-bottom:3px}
+.fk-card-sub{font-size:11.5px;color:var(--faint);margin-bottom:16px}
+.fk-kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px;margin-bottom:22px}
+.fk-kpi{background:var(--surface);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:.22s;min-width:0}
+.fk-kpi:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.fk-kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--acc,var(--brand))}
+.fk-kpi-ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:15px;background:var(--brand-soft);margin-bottom:12px}
+.fk-kpi-val{font-size:29px;font-weight:760;letter-spacing:-1.2px;line-height:1;overflow-wrap:anywhere}
+.fk-kpi-lbl{font-size:11.5px;color:var(--muted);margin-top:6px;font-weight:520}
+.fk-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:16px}
+.fk-grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:16px}
+.fk-chart-box{position:relative;height:270px}
+.fk-tbl-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+.fk-tbl-wrap table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+.fk-tbl-wrap th{text-align:left;padding:11px 14px;background:var(--brand-soft);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);white-space:nowrap}
+.fk-tbl-wrap td{padding:11px 14px;border-top:1px solid var(--border);vertical-align:middle}
+.fk-tbl-wrap tbody tr{transition:.14s}
+.fk-tbl-wrap tbody tr[data-sid]:hover{background:var(--brand-soft);cursor:pointer}
+.fk-tbl-wrap tr.off td{opacity:.55}
+.fk-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.fk-page select,.fk-page input[type=email],.fk-page input[type=password],.fk-page input[type=text],.fk-page input[type=search],.fk-modal select,.fk-modal input[type=email],.fk-modal input[type=password],.fk-modal input[type=text]{width:100%;padding:12px 14px;border-radius:11px;border:1px solid var(--border);background:var(--surface-solid);color:var(--text);font-size:14px;font-family:inherit;outline:none}
+.fk-page select:focus,.fk-page input:focus,.fk-modal select:focus,.fk-modal input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.fk-toolbar input,.fk-toolbar select{padding:9px 13px;border-radius:10px;font-size:13px}
+.fk-toolbar input{flex:1;min-width:200px}
+.fk-badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:670;letter-spacing:.3px;white-space:nowrap}
+.fk-badge.b-green{background:rgba(15,157,88,.14);color:var(--green)}
+.fk-badge.b-amber{background:rgba(232,163,23,.16);color:#b77a00}
+.fk[data-theme="dark"] .fk-badge.b-amber{color:var(--amber)}
+.fk-badge.b-red{background:rgba(220,61,61,.14);color:var(--red)}
+.fk-badge.b-blue{background:var(--brand-soft);color:var(--brand)}
+.fk-badge.b-purple{background:rgba(123,91,214,.15);color:var(--purple)}
+.fk-badge.b-grey{background:rgba(138,153,181,.16);color:var(--muted)}
+.fk-bar{height:7px;border-radius:20px;background:var(--brand-soft);overflow:hidden;min-width:56px}
+.fk-bar>i{display:block;height:100%;border-radius:20px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.fk-mini{font-size:11px;color:var(--muted)}
+.fk-prof-head{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.fk-prof-av{width:72px;height:72px;border-radius:20px;display:grid;place-items:center;font-size:24px;font-weight:750;background:linear-gradient(135deg,var(--brand),var(--purple));color:#fff;box-shadow:0 10px 26px rgba(30,95,216,.3);flex-shrink:0}
+.fk-prof-head h3{font-size:20px;letter-spacing:-.5px;margin:0}
+.fk-prof-head p{font-size:13px;color:var(--muted);margin:3px 0 0}
+.fk-meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.fk-meta{padding:13px;border-radius:12px;background:var(--brand-soft);min-width:0}
+.fk-meta span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--faint);font-weight:650}
+.fk-meta strong{display:block;font-size:13.5px;margin-top:5px;font-weight:620;word-break:break-word}
+.fk-ring{width:126px;height:126px;flex-shrink:0;display:block}
+.fk [data-card] .fk-ring{margin:0 auto}
+.fk-score-row{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.fk-gap-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin:0;padding:0}
+.fk-gap-list li{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-radius:11px;background:var(--brand-soft);font-size:12.5px;line-height:1.55}
+.fk-gap-list li .fk-badge{flex-shrink:0}
+.fk-chat{display:flex;flex-direction:column;gap:14px;max-height:420px;min-height:180px;overflow-y:auto;padding:4px 2px 12px}
+.fk-msg{max-width:82%;padding:13px 16px;border-radius:16px;font-size:13.5px;line-height:1.65;white-space:pre-line}
+.fk-msg.ai{background:var(--brand-soft);border-bottom-left-radius:5px}
+.fk-msg.me{margin-left:auto;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border-bottom-right-radius:5px}
+.fk-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.fk-chip{padding:8px 14px;border-radius:20px;background:var(--brand-soft);color:var(--brand);font-size:12px;font-weight:600;transition:.16s}
+.fk-chip:hover{background:var(--brand);color:#fff}
+.fk-ask-row{display:flex;gap:9px}
+.fk-ask-row input{flex:1;min-width:0}
+.fk-ask-row button,.fk-btn-primary{padding:12px 20px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;font-weight:640;font-size:13.5px;box-shadow:0 8px 22px rgba(30,95,216,.32);transition:.2s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.fk-btn-primary:hover{transform:translateY(-1px)}
+.fk-btn-primary[disabled]{opacity:.55;cursor:not-allowed;transform:none}
+.fk-btn-block{width:100%}
+.fk-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:9px;background:var(--brand-soft);color:var(--brand);font-size:12.5px;font-weight:600;text-decoration:none;white-space:nowrap}
+.fk-btn:hover{background:var(--brand);color:#fff}
+.fk-btn.danger{background:rgba(220,61,61,.12);color:var(--red)}
+.fk-btn.danger:hover{background:var(--red);color:#fff}
+.fk-btn.ok{background:var(--green);color:#fff}
+.fk-btn-row{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+.fk-section-h{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--faint);margin:22px 0 12px;padding-bottom:7px;border-bottom:1px solid var(--border)}
+.fk-alert{padding:13px 16px;border-radius:12px;font-size:12.5px;line-height:1.6;margin-bottom:16px;background:rgba(232,163,23,.11);border-left:3px solid var(--amber)}
+.fk-alert.red{background:rgba(220,61,61,.12);border-left-color:var(--red)}
+.fk-alert.green{background:rgba(15,157,88,.10);border-left-color:var(--green)}
+.fk-note{margin-bottom:16px;border-left:3px solid var(--amber)}
+.fk-note .fk-card-sub{margin:0;line-height:1.6}
+.fk-drop{padding:28px;border:2px dashed var(--brand);border-radius:12px;text-align:center;background:var(--brand-soft);margin-bottom:16px}
+.fk-drop-stat{margin-top:10px;color:var(--muted);font-weight:600;font-size:13px}
+.fk-loading{padding:60px 0;text-align:center;color:var(--faint);font-size:13px}
+.fk-empty{text-align:center;padding:40px 20px}
+.fk-empty p{margin:8px auto 16px;max-width:460px}
+.fk-lbl{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:14px 0 7px}
+.fk-check{display:flex;align-items:center;gap:7px;cursor:pointer;margin:0}
+.fk-check input{width:auto;margin:0}
+.fk-inline{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.fk-tbl-wrap td select,.fk-tbl-wrap td input{padding:7px 9px;font-size:12.5px;border-radius:9px;min-width:90px}
+.fk-ai-grid{display:grid;grid-template-columns:1fr 340px;gap:16px}
+.fk-modal{position:fixed;inset:0;background:rgba(6,14,30,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:200;display:grid;place-items:center;padding:20px;overflow-y:auto}
+.fk-modal-body{background:var(--surface-solid);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow-lg);padding:26px;width:100%;max-width:820px;max-height:88vh;overflow-y:auto;color:var(--text)}
+.fk-modal-body.narrow{max-width:480px}
+.fk-modal-close{float:right;width:32px;height:32px;border-radius:9px;background:var(--brand-soft);color:var(--text);font-size:17px;margin:0 0 8px 8px}
+.fk .hidden{display:none!important}
+@media(max-width:1024px){
+.fk{--sidebar:0px}
+.fk-sidebar{transform:translateX(-100%);transition:transform .28s;width:250px}
+.fk-sidebar.open{transform:translateX(0)}
+.fk-sidebar.open+.fk-scrim{display:block;position:fixed;inset:0;background:rgba(6,14,30,.45);z-index:55}
+.fk-hamburger{display:block}
+.fk-grid2,.fk-ai-grid{grid-template-columns:1fr!important}
+}
+@media(max-width:640px){
+.fk .fk-content,.fk-topbar,.fk-foot{padding-left:16px;padding-right:16px}
+.fk-topbar{gap:10px;padding-top:14px;padding-bottom:14px}
+.fk-topbar h2{font-size:16px}
+.fk-kpi-val{font-size:25px}
+.fk-user-txt{display:none}
+.fk-logout{margin-left:0}
+.fk-chart-box{height:230px}
+.fk-kpi-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.fk-grid3{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.fk-modal{padding:10px}
+.fk-modal-body{padding:18px;max-height:94vh}
+.fk-msg{max-width:100%}
+.fk-ask-row button{padding:12px 14px}
+}
+@media print{.fk-sidebar,.fk-topbar,.fk-foot,.fk-toolbar{display:none!important}.fk-main{margin-left:0}}
 </style>
 <script>
 /**
- * FKM Talent — paparan dashboard (Ringkasan, Direktori, Profil, Kenaikan Pangkat, Analitik, Penasihat, Auto-Extract CV, Import).
- * Data: SATU panggilan staf.data (sudah ditapis ikut capaian & skor sudah dikira di pelayan), dicache dalam memori 5 minit.
+ * FKM Talent — antara muka mengikut rupa sistem lama (12 halaman, sidebar, kad KPI, carta Chart.js).
+ * Shell sendiri untuk susun atur 'app' (KD.shells.app); panel pentadbir templat (/admin) kekal.
+ * Data: SATU panggilan staf.data (ditapis ikut capaian & skor dikira di pelayan), dicache dalam memori 5 minit.
  * Semua HTML melalui html`` (auto-escape). Tiada pengendali acara sebaris (CSP).
  */
 (function (KD) {
   'use strict';
-  const { html, raw, qs, qsa, on, debounce, fmtNum, esc } = KD.utils;
-  const { icon, toast, toastError, empty, errorState, skeletonStats, skeletonList } = KD.ui;
+  const { html, raw, qs, qsa, on, debounce, fmtNum } = KD.utils;
+  const { toast, toastError } = KD.ui;
 
-  /* ================================================================ KEADAAN & DATA */
+  /* ================================================================ DATA */
   const TTL = 5 * 60 * 1000;
   const fkm = {
     data: null, at: 0, pending: null,
@@ -58,7 +178,7 @@
       return fkm.pending;
     },
     invalidate() { fkm.data = null; fkm.at = 0; },
-    base() { return (location.hash || '').indexOf('#/admin') === 0 ? '/admin/fkm' : '/fkm'; },
+    base() { return '/fkm'; },
     all(d, withInactive) { return withInactive ? d.staff : d.staff.filter((s) => s.aktif); },
     find(d, sid) { return d.staff.filter((s) => s.sid === String(sid))[0]; },
     dept(d, code) { return (d.jabatan && d.jabatan[code]) || code || '—'; },
@@ -66,377 +186,736 @@
   };
   KD.fkm = fkm;
   /* Data lapuk selepas log keluar / log masuk akaun lain */
-  window.addEventListener('hashchange', () => { if (KD.auth && !KD.auth.loggedIn()) fkm.invalidate(); });
+  window.addEventListener('hashchange', () => { if (KD.auth && !KD.auth.loggedIn()) { fkm.invalidate(); SHOW_OFF = false; } });
 
+  let SHOW_OFF = false; /* "Tunjuk staf tidak aktif" — terpakai pada semua halaman (seperti sistem lama) */
+  const vis = (d) => fkm.all(d, SHOW_OFF);
   const sum = (a, f) => a.reduce((t, x) => t + (Number(f(x)) || 0), 0);
   const avg = (a, f) => (a.length ? sum(a, f) / a.length : 0);
   const pct = (n, d) => (d ? Math.round((n / d) * 100) : 0);
-  const rm = (v) => 'RM ' + (v >= 1e6 ? (v / 1e6).toFixed(2) + 'j' : v >= 1e3 ? Math.round(v / 1e3) + 'k' : fmtNum(Math.round(v)));
-  const groupCount = (a, f) => { const m = {}; a.forEach((x) => { const k = f(x) || 'Tidak dinyatakan'; m[k] = (m[k] || 0) + 1; }); return m; };
-  const toData = (m) => Object.keys(m).map((k) => ({ label: k, value: m[k] }));
-  const isProf = (s) => /^\s*prof/i.test(s.jawatan) && !/madya|assoc/i.test(s.jawatan);
-  const isMadya = (s) => /madya|assoc/i.test(s.jawatan);
+  const grp = (a, f) => { const m = {}; a.forEach((x) => { const k = f(x) || 'TIDAK DINYATAKAN'; m[k] = (m[k] || 0) + 1; }); return m; };
+  const dl = (a) => Object.keys(grp(a, (s) => s.jabatan)).sort();
+  const isMadya = (s) => /madya|assoc/i.test(s.jawatan || '');
+  const isProf = (s) => /^\s*prof/i.test(s.jawatan || '') && !isMadya(s);
   const YEARS = ['2020', '2021', '2022', '2023', '2024', '2025'];
+  const cut = (t, n) => (t.length > n ? t.slice(0, n - 2) + '…' : t);
+  const anugerah = (s) => s.anugerah.a + s.anugerah.k + s.anugerah.u;
+  const khidmatAk = (s) => s.vivaD + s.vivaL + s.penilai + s.pewasit;
+  const jkAll = (s) => s.jk.a + s.jk.k + s.jk.u + s.jk.f;
 
-  const JALUR = { HIJAU: ['badge-success', 'HIJAU', 'Layak memohon', 'c-hijau'], KUNING: ['badge-warn', 'KUNING', 'Hampir layak', 'c-kuning'], MERAH: ['badge-danger', 'MERAH', 'Perlu pembangunan', 'c-merah'] };
-  const jalurBadge = (sk, withLabel) => { const j = JALUR[sk.jalur] || JALUR.MERAH; return html`<span class="badge ${j[0]}">${j[1]}${withLabel ? ' · ' + sk.label : ''}</span>`; };
-  const barCls = (v, min) => (v < min ? 'bad' : v >= min + 15 ? 'ok' : 'warn');
-  const miniBar = (v, cls) => html`<div class="fkm-mini"><div class="fkm-bar"><i class="${cls || ''}" style="width:${Math.max(0, Math.min(100, v))}%"></i></div><strong>${v}%</strong></div>`;
+  const BAND = { HIJAU: ['GREEN', 'b-green', 'var(--green)'], KUNING: ['YELLOW', 'b-amber', 'var(--amber)'], MERAH: ['RED', 'b-red', 'var(--red)'] };
+  const band = (sk) => BAND[sk.jalur] || BAND.MERAH;
 
-  function stat(label, value, note, ic) {
-    return html`<div class="stat"><div class="stat__label">${icon(ic || 'chart')}${label}</div><div class="stat__value">${value}</div>${note ? html`<div class="stat__note">${note}</div>` : ''}</div>`;
-  }
-  function panel(title, sub, body, extraCls) {
-    return html`<section class="panel ${extraCls || ''}"><div class="panel-head"><div><h3>${title}</h3>${sub ? html`<p class="small muted">${sub}</p>` : ''}</div></div><div class="mt-3">${body}</div></section>`;
-  }
+  /* ================================================================ BLOK UI (gaya lama) */
+  const kpi = (val, lbl, acc, ico) => html`<div class="fk-kpi" style="--acc:var(${acc || '--brand'})">${ico ? html`<div class="fk-kpi-ico">${ico}</div>` : ''}<div class="fk-kpi-val">${val}</div><div class="fk-kpi-lbl">${lbl}</div></div>`;
+  const card = (title, sub, body, extra) => html`<div class="fk-card ${extra || ''}"><div class="fk-card-title">${title}</div>${sub ? html`<div class="fk-card-sub">${sub}</div>` : ''}${body}</div>`;
+  const chartCard = (title, sub, id) => card(title, sub, html`<div class="fk-chart-box"><canvas data-chart="${id}" role="img" aria-label="${title}"></canvas></div>`);
+  const tbl = (head, rows, emptyMsg) => html`<div class="fk-tbl-wrap"><table><thead><tr>${head.map((h) => html`<th>${h}</th>`)}</tr></thead><tbody>${rows.length ? rows : html`<tr><td colspan="${head.length}" style="text-align:center;padding:30px;color:var(--faint)">${emptyMsg || 'Tiada rekod dipadankan.'}</td></tr>`}</tbody></table></div>`;
+  const dept = (s) => html`<span class="fk-badge b-blue">${s.jabatan || '—'}</span>`;
+  const bar = (v, color, w) => html`<div class="fk-inline" style="flex-wrap:nowrap"><div class="fk-bar" style="width:${w || 62}px"><i style="width:${Math.max(0, Math.min(100, v))}%;background:${color}"></i></div><strong>${v}%</strong></div>`;
+  const statusBadge = (s) => html`<span class="fk-badge ${String(s.khidmat).toUpperCase() === 'PERMANENT' ? 'b-green' : 'b-amber'}">${s.khidmat || '—'}</span>`;
+  const note = (text) => html`<div class="fk-card fk-note"><div class="fk-card-sub">ⓘ ${text}</div></div>`;
+  const emptyCard = (title, msg, action) => html`<div class="fk-card fk-empty"><div class="fk-card-title">${title}</div><p class="fk-mini">${msg}</p>${action || ''}</div>`;
 
-  /* Cincin skor (SVG; nombor sahaja dimasukkan secara mentah). */
-  function ring(sk) {
+  /* Cincin skor (SVG; nombor & nama pemboleh ubah CSS tetap sahaja dimasukkan secara mentah). */
+  function ring(sk, size, label) {
     const v = Math.max(0, Math.min(100, Math.round(Number(sk.total) || 0)));
-    const col = { HIJAU: '#0F9D58', KUNING: '#D97706', MERAH: '#DC2626' }[sk.jalur] || '#DC2626';
-    return '<svg class="fkm-ring" viewBox="0 0 100 100" role="img" aria-label="Skor kesiapsiagaan ' + v + '%">' +
-      '<circle class="trk" cx="50" cy="50" r="42" fill="none" stroke-width="10"/>' +
-      '<circle cx="50" cy="50" r="42" fill="none" style="stroke:' + col + '" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + (v / 100 * 264).toFixed(1) + ' 264" transform="rotate(-90 50 50)"/>' +
-      '<text x="50" y="50" text-anchor="middle" font-size="20">' + v + '%</text><text class="sub" x="50" y="64" text-anchor="middle" font-size="7.5">KESIAPSIAGAAN</text></svg>';
+    const col = band(sk)[2];
+    return '<svg class="fk-ring" viewBox="0 0 100 100"' + (size ? ' style="width:' + size + 'px;height:' + size + 'px"' : '') + ' role="img" aria-label="Kesiapsiagaan ' + v + '%">' +
+      '<circle cx="50" cy="50" r="42" fill="none" stroke="var(--brand-soft)" stroke-width="10"/>' +
+      '<circle cx="50" cy="50" r="42" fill="none" stroke="' + col + '" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + (v / 100 * 264).toFixed(1) + ' 264" transform="rotate(-90 50 50)"/>' +
+      '<text x="50" y="' + (label === false ? 52 : 49) + '" text-anchor="middle" font-size="' + (label === false ? 20 : 21) + '" font-weight="750" fill="var(--text)">' + v + '%</text>' +
+      (label === false ? '' : '<text x="50" y="63" text-anchor="middle" font-size="8" fill="var(--faint)">READINESS</text>') + '</svg>';
   }
 
-  /* Donut (SVG). segs: [{label, value, cls}] */
-  function donut(segs, title) {
-    const total = segs.reduce((t, s) => t + s.value, 0) || 1;
-    let off = 0;
-    let s = '<svg viewBox="0 0 42 42" role="img" aria-label="' + esc(title) + '"><circle cx="21" cy="21" r="15.915" fill="none" stroke="#E2E8F0" stroke-width="6"/>';
-    segs.forEach((g) => {
-      const p = (g.value / total) * 100;
-      if (p > 0) s += '<circle class="' + g.cls + '" cx="21" cy="21" r="15.915" fill="none" stroke-width="6" stroke-dasharray="' + p.toFixed(2) + ' ' + (100 - p).toFixed(2) + '" stroke-dashoffset="' + (25 - off).toFixed(2) + '" style="stroke:currentColor"/>';
-      off += p;
+  /* ================================================================ CARTA (Chart.js 4.4.1, dimuat malas) */
+  let chartP = null;
+  const CHARTS = [];
+  function loadChart() {
+    if (window.Chart) return Promise.resolve(window.Chart);
+    if (chartP) return chartP;
+    /* GitHub Pages: salinan tempatan (CSP script-src 'self'). Iframe Apps Script: CDN. */
+    const local = !/googleusercontent\.com$|script\.google\.com$/.test(location.hostname);
+    const src = local ? 'vendor/chartjs/chart.umd.min.js' : 'https:' + '\/\/cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
+    chartP = new Promise((resolve, reject) => {
+      const sc = document.createElement('script');
+      sc.src = src;
+      sc.onload = () => resolve(window.Chart);
+      sc.onerror = () => { chartP = null; reject(new Error('Carta gagal dimuatkan. Semak sambungan internet.')); };
+      document.head.appendChild(sc);
     });
-    s += '</svg>';
-    s = s.replace(/class="(c-[a-z0-9]+)"([^>]*)style="stroke:currentColor"/g, (m, c, mid) => 'class="' + c + '"' + mid + 'style="stroke:' + ({ 'c-hijau': '#0F9D58', 'c-kuning': '#D97706', 'c-merah': '#DC2626', 'c-1': '#1E5FD8', 'c-2': '#7C3AED', 'c-3': '#0D9488', 'c-4': '#94A3B8' }[c] || '#94A3B8') + '"');
-    return html`<div class="fkm-donut">${raw(s)}<ul class="fkm-legend">${segs.map((g) => html`<li><i class="${g.cls}"></i>${g.label}: <strong>${fmtNum(g.value)}</strong> (${pct(g.value, total)}%)</li>`)}</ul></div>`;
+    return chartP;
+  }
+  function destroyCharts() { CHARTS.splice(0).forEach((c) => { try { c.destroy(); } catch (e) { /* abaikan */ } }); }
+  const cssv = (n) => getComputedStyle(qs('.fk-app') || document.body).getPropertyValue(n).trim();
+  const PAL = () => ['--brand', '--purple', '--teal', '--amber', '--green', '--red'].map(cssv).concat('#9aa8c4');
+  const legendBottom = () => ({ legend: { position: 'bottom', labels: { color: cssv('--muted'), font: { size: 11 }, boxWidth: 12, padding: 14 } } });
+  function mk(root, id, type, data, opt) {
+    loadChart().then((Chart) => {
+      const el = qs('canvas[data-chart="' + id + '"]', root);
+      if (!el || !el.isConnected) return;
+      const base = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: cssv('--muted'), font: { size: 11 }, boxWidth: 12, padding: 14 } } } };
+      if (type !== 'doughnut' && type !== 'pie' && type !== 'radar') {
+        base.scales = { x: { ticks: { color: cssv('--faint'), font: { size: 10.5 } }, grid: { color: cssv('--border') } },
+          y: { ticks: { color: cssv('--faint'), font: { size: 10.5 } }, grid: { color: cssv('--border') }, beginAtZero: true } };
+      }
+      CHARTS.push(new Chart(el, { type: type, data: data, options: Object.assign(base, opt || {}) }));
+    }).catch((e) => {
+      const el = qs('canvas[data-chart="' + id + '"]', root);
+      if (el && el.parentNode) el.parentNode.innerHTML = html`<p class="fk-mini" style="padding:40px 10px;text-align:center">${e.message}</p>`.s;
+    });
+  }
+  const yNoGrid = (max) => ({ y: { max: max, beginAtZero: true, ticks: { color: cssv('--faint') }, grid: { color: cssv('--border') } }, x: { ticks: { color: cssv('--faint') }, grid: { display: false } } });
+  const hScales = (max) => ({ x: { max: max, beginAtZero: true, ticks: { color: cssv('--faint') }, grid: { color: cssv('--border') } }, y: { ticks: { color: cssv('--faint'), font: { size: 10 } }, grid: { display: false } } });
+
+  /* ================================================================ SHELL (sidebar + topbar seperti sistem lama) */
+  const ALL = 'ADMIN DEAN HOD STAFF';
+  /* [laluan, ikon, tajuk, subtajuk, peranan, capaian laluan] */
+  const NAV = [
+    ['/utama', '▦', 'Executive Dashboard', 'Ringkasan strategik bakat akademik FKM', 'ADMIN DEAN HOD', 'user'],
+    ['/fkm/staf', '☰', 'Staff Profile', 'Direktori dan profil staf akademik', ALL, 'user'],
+    ['/fkm/kenaikan', '▲', 'Promotion Readiness', 'Skor kesiapsiagaan kenaikan pangkat', ALL, 'user'],
+    ['/fkm/latihan', '◎', 'Training Intelligence', 'Pematuhan dan analisis latihan', ALL, 'user'],
+    ['/fkm/penyelidikan', '◇', 'Research Performance', 'Penerbitan, sitasi dan indeks-H', ALL, 'user'],
+    ['/fkm/geran', '◉', 'Grant Management', 'Pembiayaan dan geran penyelidikan', ALL, 'user'],
+    ['/fkm/penyeliaan', '●', 'Supervision', 'Penyeliaan pelajar pascasiswazah', ALL, 'user'],
+    ['/fkm/khidmat', '◆', 'Khidmat & Perundingan', 'Perundingan industri, khidmat akademik & kepimpinan', ALL, 'user'],
+    ['/fkm/myra', '⭐', 'MyRA Audit Score', 'Simulasi sumbangan Star Rating MyRA KPT', 'ADMIN DEAN HOD', 'user'],
+    ['/fkm/cv', '📄', 'Auto-Extract CV', 'Muat naik PDF CV & ekstrak automatik dalam pelayar', 'ADMIN', 'admin'],
+    ['/fkm/penasihat', '☉', 'AI Career Advisor', 'Penasihat kerjaya berasaskan AI', ALL, 'user'],
+    ['/fkm/capaian', '⚿', 'User Access Control', 'Kawalan capaian dan audit log', 'ADMIN', 'admin'],
+    ['/fkm/import', '⇩', 'Import Sistem Lama', 'Salin data daripada Google Sheet sistem lama (baca sahaja)', 'SUPER', 'super']
+  ];
+  const navFor = (path) => NAV.filter((n) => n[0] === path)[0];
+
+  const THEME_KEY = 'fk.theme';
+  const getTheme = () => { try { return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'; } catch (e) { return 'light'; } };
+  const setTheme = (t) => { try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* mod peribadi */ } };
+
+  function currentRole() {
+    if (fkm.data && fkm.data.access) return fkm.data.access.peranan;
+    return KD.auth && KD.auth.isAdmin() ? 'ADMIN' : '';
+  }
+  function navAllowed(n, role) {
+    if (n[4] === 'SUPER') return KD.auth.isSuper();
+    if (!role) return n[4] === ALL;
+    return n[4].split(' ').indexOf(role) >= 0;
+  }
+  function stripTitle(name) { return String(name || '').replace(/^((DR|PROF|IR|TS|ASSOC|MADYA|IR\.|TS\.)\.?\s*)+/gi, '').trim(); }
+
+  /** Isi nav, nama & peranan pengguna, footer — dipanggil semula selepas data dimuatkan. */
+  function fillChrome() {
+    const app = qs('.fk-app');
+    if (!app) return;
+    const role = currentRole();
+    const cur = (KD.router.current && (KD.router.current.route.navPath || KD.router.current.route.path)) || '';
+    const items = NAV.filter((n) => navAllowed(n, role));
+    qs('[data-fk-nav]', app).innerHTML = html`${items.map((n) => html`<a class="fk-nav-item ${n[0] === cur ? 'active' : ''}" href="#${n[0]}" data-nav="${n[0]}" ${n[0] === cur ? raw('aria-current="page"') : ''}><span class="fk-nav-ico" aria-hidden="true">${n[1]}</span>${n[2]}</a>`)}
+      ${KD.auth.isAdmin() ? html`<div class="fk-nav-sep">Pentadbiran</div><a class="fk-nav-item" href="#/admin"><span class="fk-nav-ico" aria-hidden="true">⚙</span>Panel Pentadbir</a>` : ''}`.s;
+    const u = KD.auth.user() || {};
+    const acc = fkm.data && fkm.data.access;
+    let name = u.fullName || u.email || '';
+    if (acc && acc.peranan === 'STAFF') { const me = fkm.find(fkm.data, acc.skop); if (me) name = fkm.fullName(me); }
+    qs('[data-fk-name]', app).textContent = name;
+    qs('[data-fk-role]', app).textContent = acc ? acc.peranan + (acc.peranan === 'HOD' ? ' · ' + acc.skop : '') : (KD.auth.role() || '').replace('_', ' ');
+    qs('[data-fk-av]', app).textContent = (stripTitle(name)[0] || 'U').toUpperCase();
+    const foot = qs('[data-fk-foot]', app);
+    const built = fkm.data && fkm.data.builtAt ? new Date(fkm.data.builtAt) : null;
+    foot.innerHTML = html`Sumber data: Google Sheet <code>STAF</code> sistem FKM Talent${built && !isNaN(built) ? html` · dikira ${built.toLocaleString('ms-MY', { dateStyle: 'medium', timeStyle: 'short' })}` : ''} · dikemas kini automatik apabila data berubah · <button data-act="fk-refresh">Muat semula</button>`.s;
   }
 
-  /* Kepala halaman + muat data + keadaan ralat/tiada capaian. */
-  async function withData(el, title, sub, renderFn, opts) {
-    const tools = html`<div class="row" style="gap:8px;flex-wrap:wrap"><span data-cfg></span><button class="btn ${opts && opts.welcome ? 'btn-light' : 'btn-outline'} btn-sm" data-act="fkm-refresh">${icon('refresh')}Muat semula</button></div>`;
-    const u = (KD.auth && KD.auth.user()) || {};
-    el.innerHTML = html`${opts && opts.welcome
-      ? html`<div class="welcome"><div><h2>Selamat datang, ${u.fullName || ''}</h2><p>${title} · ${sub}</p></div>${tools}</div><div class="mt-6"></div>`
-      : html`<div class="page-head"><div><h1>${title}</h1><p>${sub}</p></div>${tools}</div>`}
-      <div data-body>${skeletonStats(4)}<div class="mt-6">${skeletonList(3)}</div></div>`.s;
-    const body = qs('[data-body]', el);
-    on(el, 'click', '[data-act="fkm-refresh"]', () => { fkm.invalidate(); KD.router.render(); });
-    let d;
-    try { d = await fkm.load(); } catch (err) {
-      body.innerHTML = errorState(err, 'fkm-refresh').s;
-      return;
+  const modal = {
+    el: () => qs('[data-fk-modal]'),
+    show(content, narrow) {
+      const m = modal.el();
+      if (!m) return null;
+      /* Elemen baharu setiap kali — pendengar acara kandungan lama dibuang bersama */
+      const old = qs('[data-fk-modal-body]', m);
+      const body = old.cloneNode(false);
+      old.replaceWith(body);
+      body.className = 'fk-modal-body' + (narrow ? ' narrow' : '');
+      body.innerHTML = html`<button class="fk-modal-close" data-act="fk-close" aria-label="Tutup">×</button>${content}`.s;
+      m.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      const f = qs('[data-autofocus]', body) || qs('.fk-modal-close', body);
+      if (f) f.focus();
+      return body;
+    },
+    close() {
+      const m = modal.el();
+      if (!m || m.classList.contains('hidden')) return;
+      m.classList.add('hidden');
+      qs('[data-fk-modal-body]', m).innerHTML = '';
+      document.body.style.overflow = '';
     }
-    if (!d.cfg.rasmi) qs('[data-cfg]', el).innerHTML = html`<span class="badge badge-warn" title="Nilai minimum/benchmark masih anggaran. Kemas kini FKM_SKOR di Panel → Tetapan selepas disahkan dengan pekeliling UTM.">Benchmark: anggaran</span>`.s;
-    if (d.access.peranan === 'TIADA') {
-      body.innerHTML = empty('Tiada capaian data', 'Akaun anda belum diberi capaian dalam sistem ini. Hubungi Unit IT FKM untuk didaftarkan dalam senarai Capaian.').s;
-      return;
-    }
-    if (!d.staff.length) {
-      body.innerHTML = empty('Belum ada data staf', d.access.peranan === 'ADMIN' ? 'Import data daripada sistem lama atau tambah staf di menu Staf Akademik.' : 'Tiada rekod staf dalam skop capaian anda.',
-        d.access.peranan === 'ADMIN' && KD.auth.isSuper() ? html`<a class="btn btn-primary" href="#/admin/fkm/import">${icon('download')}Import sistem lama</a>` : '').s;
-      return;
-    }
-    renderFn(body, d);
+  };
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.close(); });
+
+  function openPasswordModal() {
+    const b = modal.show(html`<div class="fk-card-title" style="font-size:17px">Tukar Kata Laluan</div><div class="fk-card-sub">Minimum 8 aksara, gabungan huruf dan nombor. Sesi pada peranti lain akan ditamatkan.</div>
+      <form data-fk-pw><label class="fk-lbl" for="fkPw0">Kata laluan semasa</label><input type="password" id="fkPw0" name="cur" autocomplete="current-password" required data-autofocus>
+        <label class="fk-lbl" for="fkPw1">Kata laluan baharu</label><input type="password" id="fkPw1" name="n1" autocomplete="new-password" required minlength="8">
+        <label class="fk-lbl" for="fkPw2">Sahkan kata laluan baharu</label><input type="password" id="fkPw2" name="n2" autocomplete="new-password" required minlength="8">
+        <p class="fk-mini" data-err style="color:var(--red);min-height:16px;margin:12px 0 0"></p>
+        <button class="fk-btn-primary fk-btn-block" type="submit" style="margin-top:14px">Simpan Kata Laluan</button></form>`, true);
+    if (!b) return;
+    on(b, 'submit', '[data-fk-pw]', async (e, form) => {
+      e.preventDefault();
+      const err = qs('[data-err]', b);
+      if (form.n1.value !== form.n2.value) { err.textContent = 'Kata laluan baharu tidak sepadan.'; return; }
+      const btn = qs('button[type=submit]', form);
+      KD.ui.busy(btn, async () => {
+        try {
+          await KD.api.changePassword({ currentPassword: form.cur.value, newPassword: form.n1.value });
+          modal.close(); toast('Kata laluan berjaya ditukar.');
+        } catch (ex) { err.textContent = (ex && ex.message) || 'Gagal menukar kata laluan.'; }
+      });
+    });
   }
 
-  /* ================================================================ RINGKASAN EKSEKUTIF (ganti dashboard templat) */
-  function renderExec(body, d) {
-    const st = fkm.all(d);
-    const sk = st.map((s) => s.sk);
-    const n = { h: sk.filter((x) => x.jalur === 'HIJAU').length, k: sk.filter((x) => x.jalur === 'KUNING').length, m: sk.filter((x) => x.jalur === 'MERAH').length };
-    const depts = Object.keys(groupCount(st, (s) => s.jabatan)).sort();
-    const cats = d.latihan;
-    body.innerHTML = html`
-      <div class="grid grid-4">
-        ${stat('Staf akademik aktif', fmtNum(st.length), d.access.label, 'users')}
-        ${stat('Profesor / Prof. Madya', fmtNum(st.filter(isProf).length) + ' / ' + fmtNum(st.filter(isMadya).length), 'Mengikut jawatan semasa', 'star')}
-        ${stat('Layak + hampir layak', fmtNum(n.h + n.k), n.h + ' layak · ' + n.k + ' hampir', 'activity')}
-        ${stat('Penerbitan terkumpul', fmtNum(sum(st, (s) => s.pub)), fmtNum(sum(st, (s) => s.q1 + s.q2)) + ' artikel Q1/Q2', 'book')}
-        ${stat('Geran aktif', fmtNum(sum(st, (s) => s.geranAktif)), rm(sum(st, (s) => s.dana)) + ' dana terkumpul', 'briefcase')}
-        ${stat('Jam latihan', fmtNum(Math.round(sum(st, (s) => s.jamLatihan))), 'Purata ' + avg(st, (s) => s.jamLatihan).toFixed(1) + ' jam / staf', 'clock')}
-        ${stat('Pematuhan latihan wajib', pct(st.filter((s) => s.wajib).length, st.length) + '%', st.filter((s) => !s.wajib).length + ' staf belum lengkap', 'shield')}
-        ${stat('Purata skor fakulti', Math.round(avg(st, (s) => s.sk.total)) + '%', 'Formula UTM 4 komponen', 'chart')}
-      </div>
-      <div class="grid grid-2 mt-6">
-        ${panel('Status kesiapsiagaan', 'Hijau ≥ ' + d.cfg.jalur.hijau + '% · Kuning ≥ ' + d.cfg.jalur.kuning + '% · gagal minimum/LPPT = Merah',
-          donut([{ label: 'Layak memohon', value: n.h, cls: 'c-hijau' }, { label: 'Hampir layak', value: n.k, cls: 'c-kuning' }, { label: 'Perlu pembangunan', value: n.m, cls: 'c-merah' }], 'Status kesiapsiagaan'))}
-        ${panel('Purata skor mengikut jabatan', 'Skor kesiapsiagaan (%)', KD.charts.bars(depts.map((x) => ({ label: x, value: Math.round(avg(st.filter((s) => s.jabatan === x), (s) => s.sk.total)) })), { title: 'Purata skor jabatan' }))}
-        ${panel('Taburan mengikut jabatan', 'Bilangan staf akademik', KD.charts.hbars(toData(groupCount(st, (s) => s.jabatan)).sort((a, b) => b.value - a.value), { title: 'Staf ikut jabatan' }))}
-        ${panel('Taburan mengikut gred', 'Bilangan staf', KD.charts.hbars(toData(groupCount(st, (s) => s.gred)).sort((a, b) => b.value - a.value), { title: 'Staf ikut gred', limit: 12 }))}
-        ${panel('Trend penerbitan', 'Penerbitan tahunan seluruh skop', KD.charts.line(YEARS.map((y) => ({ label: y, value: sum(st, (s) => s.trend[y]) })), { title: 'Trend penerbitan' }))}
-        ${panel('Pematuhan latihan', '% staf mencapai ≥ ' + d.cfg.latihanMinJam + ' jam bagi setiap kategori', KD.charts.hbars(cats.map((c) => ({ label: c[1], value: pct(st.filter((s) => (s.latihan[c[0]] || 0) >= d.cfg.latihanMinJam).length, st.length) })), { title: 'Pematuhan latihan (%)' }))}
+  KD.shells.app = {
+    render(root) {
+      root.innerHTML = html`<div class="fk fk-app" data-theme="${getTheme()}">
+        <aside class="fk-sidebar" aria-label="Navigasi utama">
+          <a class="fk-brand" href="#/utama"><div class="fk-brand-mark">FKM</div><div><strong>Talent Intelligence</strong><span>UTM · ${new Date().getFullYear()}</span></div></a>
+          <nav class="fk-nav" data-fk-nav></nav>
+          <div class="fk-sidebar-foot">
+            <button class="fk-theme-btn" data-act="fk-pw" style="margin-bottom:8px">🔑 Tukar Kata Laluan</button>
+            <button class="fk-theme-btn" data-act="fk-theme"><span data-theme-ico>${getTheme() === 'dark' ? '☼' : '☽'}</span> <span data-theme-lbl>${getTheme() === 'dark' ? 'Light Mode' : 'Dark Mode'}</span></button>
+          </div>
+        </aside>
+        <div class="fk-scrim" data-act="fk-close-nav"></div>
+        <div class="fk-main">
+          <header class="fk-topbar">
+            <button class="fk-hamburger" data-act="fk-menu" aria-label="Menu">☰</button>
+            <div class="fk-title"><h2 data-fk-title></h2><p data-fk-sub></p></div>
+            <div class="fk-user-chip"><a class="fk-avatar" href="#/profil" title="Profil & notifikasi" data-fk-av>?</a><div class="fk-user-txt"><strong data-fk-name></strong><span data-fk-role></span></div>
+              <button class="fk-logout" data-act="logout">Keluar</button></div>
+          </header>
+          <div id="view" class="content fk-content"></div>
+          <footer class="fk-foot" data-fk-foot></footer>
+        </div>
+        <div class="fk-modal hidden" data-fk-modal role="dialog" aria-modal="true" aria-label="Butiran"><div class="fk-modal-body" data-fk-modal-body></div></div>
       </div>`.s;
-  }
-
-  KD.views.dashboard = {
-    async render(el, params, query) {
-      let d;
-      try { d = await fkm.load(); } catch (e) { d = null; }
-      if (d && d.access.peranan === 'STAFF') return KD.views.fkmProfil.render(el, { sid: d.access.skop }, Object.assign({ welcome: '1' }, query));
-      return withData(el, 'Ringkasan Eksekutif', 'Gambaran strategik bakat akademik FKM', renderExec, { welcome: true });
-    }
-  };
-  KD.views.fkmExec = KD.views.dashboard;
-
-  /* ================================================================ DIREKTORI STAF */
-  KD.views.fkmStaf = {
-    async render(el, params, query) {
-      return withData(el, 'Direktori Staf', 'Profil dan kesiapsiagaan staf akademik', (body, d) => {
-        if (d.access.peranan === 'STAFF') { KD.router.go(fkm.base() + '/staf/' + encodeURIComponent(d.access.skop), true); return; }
-        const depts = Object.keys(groupCount(d.staff, (s) => s.jabatan)).sort();
-        const grades = Object.keys(groupCount(d.staff, (s) => s.gred)).sort();
-        const inactive = d.staff.filter((s) => !s.aktif).length;
-        body.innerHTML = html`<div class="toolbar">
-            <label class="search">${icon('search')}<input class="input" data-q placeholder="Cari nama, Staff ID, e-mel, kepakaran…" aria-label="Cari staf" value="${query.q || ''}"></label>
-            <select class="select" data-f="jabatan" aria-label="Jabatan"><option value="">Semua jabatan</option>${depts.map((x) => html`<option value="${x}">${x}</option>`)}</select>
-            <select class="select" data-f="gred" aria-label="Gred"><option value="">Semua gred</option>${grades.map((x) => html`<option value="${x}">${x}</option>`)}</select>
-            <select class="select" data-f="jalur" aria-label="Status"><option value="">Semua status</option><option value="HIJAU">Layak</option><option value="KUNING">Hampir layak</option><option value="MERAH">Perlu pembangunan</option></select>
-            ${inactive ? html`<label class="check small"><input type="checkbox" data-inactive> Papar ${inactive} tidak aktif</label>` : ''}
-            ${d.access.peranan === 'ADMIN' ? html`<a class="btn btn-primary btn-sm" href="#/admin/staf/baru">${icon('plus')}Tambah staf</a>` : ''}
-          </div>
-          <section class="panel panel-flush"><div class="panel-head"><h3>Staf akademik</h3><span class="small muted" data-count></span></div>
-          <div class="table-wrap"><table class="table fkm-table"><thead><tr><th>Staf</th><th>Jabatan</th><th>Gred</th><th>Sasaran</th><th>Kesiapsiagaan</th><th>Status</th></tr></thead><tbody data-rows></tbody></table></div></section>`.s;
-        const draw = () => {
-          const q = qs('[data-q]', body).value.trim().toLowerCase();
-          const f = {}; qsa('[data-f]', body).forEach((s) => { f[s.dataset.f] = s.value; });
-          const showOff = qs('[data-inactive]', body) && qs('[data-inactive]', body).checked;
-          const rows = fkm.all(d, showOff).filter((s) => (!f.jabatan || s.jabatan === f.jabatan) && (!f.gred || s.gred === f.gred) && (!f.jalur || s.sk.jalur === f.jalur) &&
-            (!q || [s.nama, s.sid, s.email, s.kepakaran, s.niche, s.rg].join(' ').toLowerCase().indexOf(q) >= 0));
-          qs('[data-count]', body).textContent = rows.length + ' daripada ' + fkm.all(d, showOff).length + ' rekod';
-          qs('[data-rows]', body).innerHTML = rows.length ? html`${rows.map((s) => html`<tr class="${s.aktif ? '' : 'fkm-row-off'}">
-              <td><a class="cell-strong" href="#${fkm.base()}/staf/${encodeURIComponent(s.sid)}">${fkm.fullName(s)}</a><div class="xs muted">ID ${s.sid}${s.email ? ' · ' + s.email : ''}</div></td>
-              <td><span class="badge badge-brand">${s.jabatan}</span></td><td>${s.gred}</td><td>${s.sk.sasaran}</td>
-              <td>${miniBar(s.sk.total, s.sk.jalur === 'HIJAU' ? 'ok' : s.sk.jalur === 'KUNING' ? 'warn' : 'bad')}</td>
-              <td>${jalurBadge(s.sk)}${s.aktif ? '' : html` <span class="badge badge-muted">${s.status}</span>`}</td></tr>`)}`.s
-            : html`<tr><td colspan="6" class="muted" style="text-align:center;padding:28px">Tiada rekod dipadankan.</td></tr>`.s;
-        };
-        on(body, 'input', '[data-q]', debounce(draw, 150));
-        on(body, 'change', '[data-f],[data-inactive]', draw);
-        draw();
+      const app = qs('.fk-app', root);
+      const sidebar = qs('.fk-sidebar', app);
+      on(app, 'click', '[data-act="logout"]', () => KD.auth.logout());
+      on(app, 'click', '[data-act="fk-menu"]', () => sidebar.classList.toggle('open'));
+      on(app, 'click', '[data-act="fk-close-nav"]', () => sidebar.classList.remove('open'));
+      on(app, 'click', '.fk-nav-item', () => sidebar.classList.remove('open'));
+      on(app, 'click', '[data-act="fk-pw"]', openPasswordModal);
+      on(app, 'click', '[data-act="fk-refresh"]', () => { fkm.invalidate(); KD.router.render(); });
+      on(app, 'click', '[data-act="fk-close"]', () => modal.close());
+      on(app, 'click', '[data-fk-modal]', (e, m) => { if (e.target === m) modal.close(); });
+      on(app, 'click', '[data-act="fk-theme"]', () => {
+        const t = app.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        app.setAttribute('data-theme', t); setTheme(t);
+        qs('[data-theme-ico]', app).textContent = t === 'dark' ? '☼' : '☽';
+        qs('[data-theme-lbl]', app).textContent = t === 'dark' ? 'Light Mode' : 'Dark Mode';
+        KD.router.render(); /* lukis semula carta dengan warna tema */
       });
+    },
+    update(route) {
+      destroyCharts();
+      modal.close();
+      const n = navFor(route.navPath || route.path);
+      setTitle(n ? n[2] : (route.title || ''), n ? n[3] : (route.sub || ''));
+      fillChrome();
     }
   };
-
-  /* ================================================================ PROFIL STAF */
-  function profileBody(s, d) {
-    const cfg = d.cfg, sk = s.sk, M = cfg.minimum, W = cfg.bobot;
-    const comps = [['Penyelidikan & penerbitan', sk.r, W.penyelidikan, M.penyelidikan], ['Pengajaran & penyeliaan', sk.t, W.pengajaran, M.pengajaran],
-      ['Khidmat & perundingan industri', sk.k, W.khidmat, M.khidmat], ['Sanjungan & kepimpinan', sk.l, W.kepimpinan, M.kepimpinan]];
-    const meta = [['Jabatan', s.jabatan + ' — ' + fkm.dept(d, s.jabatan)], ['Jawatan / gred', s.jawatan + ' · ' + s.gred], ['Sasaran', sk.sasaran],
-      ['Jawatan pentadbiran', s.jp || '—'], ['Bidang kepakaran', s.kepakaran || '—'], ['Niche area', s.niche || '—'],
-      ['Research group', (s.rgKod || '—') + ' · ' + (s.rgPeranan || '—')], ['Research alliance', s.alliance || '—'],
-      ['Kelayakan', s.kelayakan || '—'], ['Status perkhidmatan', s.khidmat || '—'], ['Tempoh perkhidmatan', s.tempoh !== null ? s.tempoh + ' tahun' : '—'],
-      ['Lantikan pertama', s.lantikPertama || '—'], ['Lantikan kini', s.lantikKini || '—'], ['Tamat perkhidmatan', s.tamat || '—'],
-      ['Scopus ID', s.scopusId || '—'], ['E-mel', s.email || '—'], ['LPPT 2025 / 24 / 23', s.lppt.map((x) => (x === null ? '—' : x)).join(' / ')],
-      ['Sumber data', (s.sumber || '—') + (s.cvTarikh ? ' · CV ' + s.cvTarikh : '')]];
-    const kpi = [['Penerbitan', s.pub, 'book'], ['Q1 + Q2', s.q1 + s.q2, 'star'], ['Sitasi · Indeks-H', fmtNum(s.sitasi) + ' · ' + s.hindex, 'activity'],
-      ['Geran (aktif)', s.geran + ' (' + s.geranAktif + ')', 'briefcase'], ['Sebagai PI', s.pi, 'user'], ['Dana geran', rm(s.dana), 'chart'],
-      ['PhD (tamat)', s.phd + ' (' + s.phdTamat + ')', 'users'], ['Sarjana (tamat)', s.ms + ' (' + s.msTamat + ')', 'users'],
-      ['Perundingan', s.perundingan + ' · ' + rm(s.nilaiPerundingan), 'link'], ['Jam latihan', fmtNum(s.jamLatihan), 'clock'],
-      ['Anugerah', s.anugerah.a + s.anugerah.k + s.anugerah.u, 'star'], ['Hak cipta', s.hakCipta, 'shield']];
-    const admin = d.access.peranan === 'ADMIN';
-    return html`
-      <section class="panel"><div class="row" style="gap:16px;align-items:flex-start;flex-wrap:wrap">
-        <div class="avatar" style="width:56px;height:56px;font-size:22px">${(s.nama || '?').charAt(0)}</div>
-        <div class="grow"><h2 style="margin:0">${fkm.fullName(s)}</h2><p class="muted small" style="margin:4px 0 8px">Staff ID ${s.sid} · ${s.jawatan}</p>
-          <div class="row" style="gap:6px;flex-wrap:wrap"><span class="badge badge-brand">${s.jabatan}</span><span class="badge badge-muted">${s.gred}</span>${jalurBadge(sk, true)}
-          ${s.aktif ? '' : html`<span class="badge badge-danger">${s.status}</span>`}</div></div>
-        ${admin ? html`<div class="row" style="gap:8px;flex-wrap:wrap"><a class="btn btn-outline btn-sm" href="#/admin/staf/${s.id}/sunting">${icon('edit')}Sunting</a><a class="btn btn-outline btn-sm" href="#/admin/staf/${s.id}">${icon('settings')}Status / rekod</a></div>` : ''}
-      </div>
-      ${s.aktif ? '' : html`<div class="alert alert-warn mt-4"><div>Rekod ini tidak aktif (${s.status}) dan dikecualikan daripada semua KPI, carta dan kiraan kesiapsiagaan.</div></div>`}
-      <div class="fkm-meta mt-6">${meta.map((m) => html`<div><span>${m[0]}</span><strong>${m[1]}</strong></div>`)}</div></section>
-      <div class="grid grid-4 mt-6">${kpi.map((k) => stat(k[0], k[1], '', k[2]))}</div>
-      <section class="panel mt-6"><div class="panel-head"><div><h3>Kesiapsiagaan kenaikan pangkat</h3><p class="small muted">Sasaran ${sk.sasaran} · LPPT purata ${sk.lppt === null ? '—' : sk.lppt + '%'} (min ${cfg.lpptMinimum}%)</p></div></div>
-        <div class="fkm-score mt-3">${raw(ring(sk))}<div class="grow">${comps.map((c) => html`<div class="fkm-comp"><div class="fkm-comp__head"><span>${c[0]} <span class="muted">(${c[2]}%)</span></span><strong>${c[1]}%</strong></div>
-          <div class="fkm-bar"><i class="${barCls(c[1], c[3])}" style="width:${c[1]}%"></i></div>${c[1] < c[3] ? html`<div class="xs" style="color:#DC2626">Bawah minimum ${c[3]}%</div>` : ''}</div>`)}</div></div>
-        <h4 class="mt-6">Analisis jurang</h4><ul class="fkm-gaps mt-3">${s.jurang.map((g) => html`<li><span class="badge badge-warn">${g[0]}</span><span>${g[1]}</span></li>`)}</ul></section>`;
+  function setTitle(t, s) {
+    const a = qs('[data-fk-title]'), b = qs('[data-fk-sub]');
+    if (a) a.textContent = t || '';
+    if (b) b.textContent = s || '';
+    document.title = (t ? t + ' — ' : '') + ((KD.config && KD.config.SYSTEM_NAME) || 'FKM Talent');
   }
+  /* Selepas log masuk: semua peranan bermula di Executive Dashboard (staf → profil sendiri). */
+  KD.home = () => '/utama';
 
-  KD.views.fkmProfil = {
-    async render(el, params, query) {
-      return withData(el, 'Profil Staf', 'Profil, pencapaian dan analisis jurang', (body, d) => {
-        const s = fkm.find(d, params.sid);
-        if (!s) { body.innerHTML = empty('Profil tidak dijumpai', 'Rekod ini tiada atau di luar skop capaian anda.').s; return; }
-        body.innerHTML = html`${d.access.peranan !== 'STAFF' ? html`<a class="back-link" href="#${fkm.base()}/staf">${icon('chev-left')}Direktori staf</a>` : ''}${profileBody(s, d)}`.s;
-      }, { welcome: !!(query && query.welcome) });
-    }
-  };
-
-  /* ================================================================ KENAIKAN PANGKAT */
-  KD.views.fkmKenaikan = {
-    async render(el) {
-      return withData(el, 'Kesiapsiagaan Kenaikan Pangkat', 'Skor UTM 4 komponen + syarat minimum & LPPT', (body, d) => {
-        const st = fkm.all(d).slice().sort((a, b) => b.sk.total - a.sk.total);
-        const c = { h: st.filter((s) => s.sk.jalur === 'HIJAU').length, k: st.filter((s) => s.sk.jalur === 'KUNING').length };
-        c.m = st.length - c.h - c.k;
-        const lpptFail = st.filter((s) => !s.sk.lpptLulus).length;
-        const W = d.cfg.bobot;
-        body.innerHTML = html`<div class="grid grid-4">${stat('Layak memohon', c.h, 'Skor ≥ ' + d.cfg.jalur.hijau + '% tanpa gagal minimum', 'check')}${stat('Hampir layak', c.k, 'Skor ' + d.cfg.jalur.kuning + '–' + (d.cfg.jalur.hijau - 1) + '%', 'activity')}
-            ${stat('Perlu pembangunan', c.m, lpptFail + ' gagal syarat LPPT', 'alert')}${stat('Purata skor', Math.round(avg(st, (s) => s.sk.total)) + '%', 'Penyelidikan ' + W.penyelidikan + ' · Pengajaran ' + W.pengajaran + ' · Khidmat ' + W.khidmat + ' · Kepimpinan ' + W.kepimpinan, 'chart')}</div>
-          <div class="grid grid-2 mt-6">
-            ${panel('Taburan status', '', donut([{ label: 'Layak', value: c.h, cls: 'c-hijau' }, { label: 'Hampir layak', value: c.k, cls: 'c-kuning' }, { label: 'Perlu pembangunan', value: c.m, cls: 'c-merah' }], 'Taburan status'))}
-            ${panel('Purata komponen', 'Kekuatan & kelemahan kolektif (%)', KD.charts.hbars([['Penyelidikan', 'r'], ['Pengajaran', 't'], ['Khidmat', 'k'], ['Kepimpinan', 'l']].map((x) => ({ label: x[0], value: Math.round(avg(st, (s) => s.sk[x[1]])) })), { title: 'Purata komponen' }))}
-          </div>
-          <section class="panel panel-flush mt-6"><div class="panel-head"><h3>Senarai kesiapsiagaan</h3><span class="small muted">Disusun ikut skor tertinggi</span></div>
-          <div class="table-wrap"><table class="table fkm-table"><thead><tr><th>Staf</th><th>Jabatan</th><th>Sasaran</th><th>Skor</th><th>Status</th><th>Jurang utama</th></tr></thead><tbody>
-          ${st.map((s) => html`<tr><td><a class="cell-strong" href="#${fkm.base()}/staf/${encodeURIComponent(s.sid)}">${fkm.fullName(s)}</a></td><td>${s.jabatan}</td><td>${s.sk.sasaran}</td>
-            <td>${miniBar(s.sk.total, s.sk.jalur === 'HIJAU' ? 'ok' : s.sk.jalur === 'KUNING' ? 'warn' : 'bad')}</td><td>${jalurBadge(s.sk)}</td><td class="small">${s.jurang[0][0]}</td></tr>`)}
-          </tbody></table></div></section>`.s;
-      });
-    }
-  };
-
-  /* ================================================================ ANALITIK (tab) */
-  const TABS = [['latihan', 'Latihan'], ['penyelidikan', 'Penyelidikan'], ['geran', 'Geran'], ['penyeliaan', 'Penyeliaan'], ['khidmat', 'Khidmat & Perundingan'], ['myra', 'MyRA (indikatif)']];
-  function table(head, rows, opts) {
+  /**
+   * Pembungkus halaman: muat data, kendalikan ralat / tiada capaian / data kosong, kemudian lukis.
+   * opts.roles: peranan yang dibenarkan (STAFF dialih ke profil sendiri); opts.allowEmpty: lukis walaupun tiada staf.
+   */
+  function page(fn, opts) {
     opts = opts || {};
-    const limit = opts.limit || 30;
-    return html`<div class="table-wrap"><table class="table fkm-table"><thead><tr>${head.map((h) => html`<th class="${h[1] ? 'num' : ''}">${h[0]}</th>`)}</tr></thead>
-      <tbody>${rows.slice(0, limit).map((r) => html`<tr>${r.map((c, i) => (i === 0 ? html`<td>${c}</td>` : html`<td class="${head[i][1] ? 'num' : ''}">${c}</td>`))}</tr>`)}</tbody></table></div>
-      ${rows.length > limit ? html`<p class="xs muted" style="padding:10px 16px">Memaparkan ${limit} teratas daripada ${rows.length}. Lihat profil individu untuk butiran penuh.</p>` : ''}`;
+    return {
+      async render(el, params, query) {
+        el.innerHTML = '<div class="fk-page"><div class="fk-loading">Memuatkan data…</div></div>';
+        let d;
+        try { d = await fkm.load(); } catch (err) {
+          el.innerHTML = html`<div class="fk-page">${emptyCard('Tidak dapat memuatkan data', (err && err.message) || 'Sila cuba semula.', html`<button class="fk-btn" data-act="fk-refresh">Cuba semula</button>`)}</div>`.s;
+          return;
+        }
+        if (!el.isConnected) return;
+        fillChrome();
+        const role = d.access.peranan;
+        if (role === 'TIADA') {
+          el.innerHTML = html`<div class="fk-page">${emptyCard('Tiada capaian data', 'Akaun anda belum diberi capaian dalam sistem ini. Hubungi Unit IT FKM untuk didaftarkan dalam senarai capaian.')}</div>`.s;
+          return;
+        }
+        if (opts.roles && opts.roles.indexOf(role) < 0) {
+          if (role === 'STAFF') { KD.router.go('/fkm/staf', true); return; }
+          el.innerHTML = html`<div class="fk-page">${emptyCard('Tiada akses', 'Halaman ini hanya untuk pentadbir.')}</div>`.s;
+          return;
+        }
+        if (!d.staff.length && !opts.allowEmpty) {
+          el.innerHTML = html`<div class="fk-page">${emptyCard('Belum ada data staf', role === 'ADMIN' ? 'Import data daripada sistem lama atau tambah staf baharu.' : 'Tiada rekod staf dalam skop capaian anda.',
+            role === 'ADMIN' && KD.auth.isSuper() ? html`<a class="fk-btn-primary" href="#/fkm/import">Import sistem lama</a>` : '')}</div>`.s;
+          return;
+        }
+        const w = document.createElement('div');
+        w.className = 'fk-page';
+        el.innerHTML = '';
+        el.appendChild(w);
+        on(w, 'click', 'tr[data-sid]', (e, tr) => { if (!e.target.closest('a,button,select,input')) openProfile(d, tr.getAttribute('data-sid')); });
+        fn(w, d, params || {}, query || {});
+      }
+    };
   }
-  const link = (s) => html`<a class="cell-strong" href="#${fkm.base()}/staf/${encodeURIComponent(s.sid)}">${s.nama}</a><div class="xs muted">${s.jabatan}</div>`;
-  const byDept = (st, f) => Object.keys(groupCount(st, (s) => s.jabatan)).sort().map((x) => ({ label: x, value: Math.round(sum(st.filter((s) => s.jabatan === x), f)) }));
 
-  const TAB_RENDER = {
-    latihan(st, d) {
-      const cats = d.latihan, min = d.cfg.latihanMinJam;
-      return html`<div class="grid grid-4">${stat('Jumlah jam latihan', fmtNum(Math.round(sum(st, (s) => s.jamLatihan))), '', 'clock')}${stat('Purata / staf', avg(st, (s) => s.jamLatihan).toFixed(1) + ' jam', '', 'activity')}
-          ${stat('Latihan wajib lengkap', pct(st.filter((s) => s.wajib).length, st.length) + '%', '', 'shield')}${stat('Belum patuh', st.filter((s) => !s.wajib).length + ' staf', 'Latihan wajib belum lengkap', 'alert')}</div>
-        <div class="grid grid-2 mt-6">${panel('Pematuhan mengikut kategori', '% staf ≥ ' + min + ' jam', KD.charts.hbars(cats.map((c) => ({ label: c[1], value: pct(st.filter((s) => (s.latihan[c[0]] || 0) >= min).length, st.length) })), { title: 'Pematuhan latihan' }))}
-          ${panel('Purata jam mengikut jabatan', '', KD.charts.bars(Object.keys(groupCount(st, (s) => s.jabatan)).sort().map((x) => ({ label: x, value: Math.round(avg(st.filter((s) => s.jabatan === x), (s) => s.jamLatihan)) })), { title: 'Purata jam latihan' }))}</div>
-        <section class="panel panel-flush mt-6"><div class="panel-head"><h3>Rekod latihan staf</h3><span class="small muted">Disusun ikut jam terendah (keutamaan intervensi)</span></div>
-        ${table([['Staf'], ...cats.map((c) => [c[1].split(' ')[0], 1]), ['Jumlah', 1], ['Wajib']], st.slice().sort((a, b) => a.jamLatihan - b.jamLatihan)
-          .map((s) => [link(s), ...cats.map((c) => s.latihan[c[0]] || 0), s.jamLatihan, s.wajib ? html`<span class="badge badge-success">Lengkap</span>` : html`<span class="badge badge-danger">Belum</span>`]))}</section>`;
-    },
-    penyelidikan(st) {
-      return html`<div class="grid grid-4">${stat('Penerbitan', fmtNum(sum(st, (s) => s.pub)), '', 'book')}${stat('Q1 / Q2', fmtNum(sum(st, (s) => s.q1)) + ' / ' + fmtNum(sum(st, (s) => s.q2)), '', 'star')}
-          ${stat('Scopus / WoS', fmtNum(sum(st, (s) => s.scopus)) + ' / ' + fmtNum(sum(st, (s) => s.wos)), '', 'database')}${stat('Sitasi · purata H', fmtNum(sum(st, (s) => s.sitasi)) + ' · ' + avg(st, (s) => s.hindex).toFixed(1), '', 'activity')}</div>
-        <div class="grid grid-2 mt-6">${panel('Trend penerbitan', '2020–2025', KD.charts.line(YEARS.map((y) => ({ label: y, value: sum(st, (s) => s.trend[y]) })), { title: 'Trend penerbitan' }))}
-          ${panel('Kualiti penerbitan', 'Kuartil', donut([{ label: 'Q1', value: sum(st, (s) => s.q1), cls: 'c-hijau' }, { label: 'Q2', value: sum(st, (s) => s.q2), cls: 'c-1' }, { label: 'Q3/Q4', value: sum(st, (s) => s.q3 + s.q4), cls: 'c-kuning' }, { label: 'Lain-lain', value: Math.max(0, sum(st, (s) => s.pub - s.q1 - s.q2 - s.q3 - s.q4)), cls: 'c-4' }], 'Kuartil'))}
-          ${panel('Sitasi mengikut research alliance', '', KD.charts.hbars(toData(st.reduce((m, s) => { const k = s.alliance || 'Tidak dinyatakan'; m[k] = (m[k] || 0) + s.sitasi; return m; }, {})).sort((a, b) => b.value - a.value), { title: 'Sitasi ikut alliance' }))}
-          ${panel('Penerbitan mengikut jabatan', '', KD.charts.bars(byDept(st, (s) => s.pub), { title: 'Penerbitan ikut jabatan' }))}</div>
-        <section class="panel panel-flush mt-6"><div class="panel-head"><h3>Penyelidik utama</h3><span class="small muted">Ikut indeks-H</span></div>
-        ${table([['Staf'], ['Penerbitan', 1], ['Q1', 1], ['Q2', 1], ['Scopus', 1], ['WoS', 1], ['Sitasi', 1], ['H', 1]],
-          st.slice().sort((a, b) => b.hindex - a.hindex || b.sitasi - a.sitasi).map((s) => [link(s), s.pub, s.q1, s.q2, s.scopus, s.wos, fmtNum(s.sitasi), s.hindex]))}</section>`;
-    },
-    geran(st) {
-      const total = sum(st, (s) => s.dana);
-      return html`<div class="grid grid-4">${stat('Jumlah dana', rm(total), '', 'chart')}${stat('Geran (aktif)', fmtNum(sum(st, (s) => s.geran)) + ' (' + fmtNum(sum(st, (s) => s.geranAktif)) + ')', '', 'briefcase')}
-          ${stat('Staf pernah PI', st.filter((s) => s.pi > 0).length, pct(st.filter((s) => s.pi > 0).length, st.length) + '% staf', 'user')}${stat('Purata dana / staf', rm(st.length ? total / st.length : 0), '', 'activity')}</div>
-        <div class="grid grid-2 mt-6">${panel('Dana mengikut jabatan', 'RM', KD.charts.bars(byDept(st, (s) => s.dana), { title: 'Dana ikut jabatan' }))}
-          ${panel('Portfolio geran', '', donut([{ label: 'Aktif', value: sum(st, (s) => s.geranAktif), cls: 'c-1' }, { label: 'Selesai', value: Math.max(0, sum(st, (s) => s.geran - s.geranAktif)), cls: 'c-4' }], 'Portfolio geran'))}</div>
-        <section class="panel panel-flush mt-6"><div class="panel-head"><h3>Rekod geran staf</h3><span class="small muted">Ikut jumlah dana</span></div>
-        ${table([['Staf'], ['Geran', 1], ['Aktif', 1], ['PI', 1], ['Dana (RM)', 1]], st.slice().sort((a, b) => b.dana - a.dana).map((s) => [link(s), s.geran, s.geranAktif, s.pi, fmtNum(Math.round(s.dana))]))}</section>`;
-    },
-    penyeliaan(st) {
-      const on2 = Math.max(0, sum(st, (s) => s.phd + s.ms - s.phdTamat - s.msTamat));
-      return html`<div class="grid grid-4">${stat('PhD diselia', fmtNum(sum(st, (s) => s.phd)), fmtNum(sum(st, (s) => s.phdTamat)) + ' bergraduat', 'users')}${stat('Sarjana diselia', fmtNum(sum(st, (s) => s.ms)), fmtNum(sum(st, (s) => s.msTamat)) + ' bergraduat', 'users')}
-          ${stat('Sedang diselia', fmtNum(on2), '', 'clock')}${stat('Staf tiada penyeliaan PhD', st.filter((s) => !s.phd).length, '', 'alert')}</div>
-        <div class="grid grid-2 mt-6">${panel('PhD mengikut jabatan', '', KD.charts.bars(byDept(st, (s) => s.phd), { title: 'PhD ikut jabatan' }))}${panel('Sarjana mengikut jabatan', '', KD.charts.bars(byDept(st, (s) => s.ms), { title: 'Sarjana ikut jabatan' }))}</div>
-        <section class="panel panel-flush mt-6"><div class="panel-head"><h3>Rekod penyeliaan</h3></div>
-        ${table([['Staf'], ['PhD', 1], ['PhD tamat', 1], ['Sarjana', 1], ['Sarjana tamat', 1], ['Kadar graduasi', 1]], st.slice().sort((a, b) => (b.phd + b.ms) - (a.phd + a.ms))
-          .map((s) => [link(s), s.phd, s.phdTamat, s.ms, s.msTamat, pct(s.phdTamat + s.msTamat, s.phd + s.ms) + '%']))}</section>`;
-    },
-    khidmat(st) {
-      return html`<div class="alert alert-info"><div>Data daripada bahagian SUMMARY REPORT CV Akademik UTM (jumlah terkumpul).</div></div>
-        <div class="grid grid-4 mt-4">${stat('Projek perundingan', fmtNum(sum(st, (s) => s.perundingan)), rm(sum(st, (s) => s.nilaiPerundingan)), 'link')}
-          ${stat('Khidmat akademik', fmtNum(sum(st, (s) => s.vivaD + s.vivaL + s.penilai + s.pewasit)), 'VIVA, penilai geran, pewasit', 'book')}
-          ${stat('Jawatankuasa', fmtNum(sum(st, (s) => s.jk.a + s.jk.k + s.jk.u + s.jk.f)), '', 'users')}${stat('Anugerah · hak cipta', fmtNum(sum(st, (s) => s.anugerah.a + s.anugerah.k + s.anugerah.u)) + ' · ' + fmtNum(sum(st, (s) => s.hakCipta)), '', 'star')}</div>
-        <div class="grid grid-2 mt-6">${panel('Jawatankuasa mengikut peringkat', '', donut([{ label: 'Antarabangsa', value: sum(st, (s) => s.jk.a), cls: 'c-merah' }, { label: 'Kebangsaan', value: sum(st, (s) => s.jk.k), cls: 'c-kuning' }, { label: 'Universiti', value: sum(st, (s) => s.jk.u), cls: 'c-1' }, { label: 'Fakulti', value: sum(st, (s) => s.jk.f), cls: 'c-3' }], 'Jawatankuasa'))}
-          ${panel('Beban pengajaran (jam kredit)', 'UG + PG mengikut jabatan', KD.charts.bars(byDept(st, (s) => s.ajarUg + s.ajarPg), { title: 'Jam kredit ikut jabatan' }))}</div>
-        <section class="panel panel-flush mt-6"><div class="panel-head"><h3>Rekod khidmat & perundingan</h3></div>
-        ${table([['Staf'], ['Perundingan', 1], ['Nilai (RM)', 1], ['Khidmat akademik', 1], ['J/kuasa', 1], ['Jam kredit', 1], ['Anugerah', 1]], st.slice().sort((a, b) => b.nilaiPerundingan - a.nilaiPerundingan)
-          .map((s) => [link(s), s.perundingan, fmtNum(Math.round(s.nilaiPerundingan)), s.vivaD + s.vivaL + s.penilai + s.pewasit, s.jk.a + s.jk.k + s.jk.u + s.jk.f, s.ajarUg + s.ajarPg, s.anugerah.a + s.anugerah.k + s.anugerah.u]))}</section>`;
-    },
-    myra(st) {
-      const q = sum(st, (s) => s.q1 + s.q2), phd = sum(st, (s) => s.phdTamat), per = (q + phd) / Math.max(1, st.length);
-      const stars = per >= 4 ? 5 : per >= 3 ? 4 : per >= 2 ? 3 : per >= 1 ? 2 : 1;
-      return html`<div class="alert alert-warn"><div>MyRA ialah penilaian bintang KPT. Ini <strong>anggaran indikatif</strong> untuk pemantauan dalaman (ketumpatan Q1/Q2 + graduan PhD per staf) — bukan skor MyRA rasmi.</div></div>
-        <div class="grid grid-4 mt-4">${stat('Unjuran bintang', '★'.repeat(stars) + '☆'.repeat(5 - stars), per.toFixed(2) + ' output / staf', 'star')}${stat('Dana penyelidikan', rm(sum(st, (s) => s.dana)), '', 'chart')}
-          ${stat('Perundingan industri', rm(sum(st, (s) => s.nilaiPerundingan)), '', 'link')}${stat('Q1/Q2 · graduan PhD', fmtNum(q) + ' · ' + fmtNum(phd), '', 'book')}</div>
-        <div class="grid grid-2 mt-6">${panel('Sumbangan mengikut jabatan', 'Q1/Q2 + graduan PhD', KD.charts.bars(byDept(st, (s) => s.q1 + s.q2 + s.phdTamat), { title: 'Sumbangan MyRA' }))}
-          ${panel('Ekosistem kewangan penyelidikan', 'Geran vs perundingan (RM)', donut([{ label: 'Geran', value: Math.round(sum(st, (s) => s.dana)), cls: 'c-1' }, { label: 'Perundingan', value: Math.round(sum(st, (s) => s.nilaiPerundingan)), cls: 'c-3' }], 'Kewangan'))}</div>
-        <section class="panel panel-flush mt-6"><div class="panel-head"><h3>Penyumbang utama</h3></div>
-        ${table([['Staf'], ['Q1/Q2', 1], ['Graduan PhD', 1], ['Geran (RM)', 1], ['Perundingan (RM)', 1]], st.slice().sort((a, b) => (b.q1 + b.q2 + b.phdTamat) - (a.q1 + a.q2 + a.phdTamat))
-          .map((s) => [link(s), s.q1 + s.q2, s.phdTamat, fmtNum(Math.round(s.dana)), fmtNum(Math.round(s.nilaiPerundingan))]), { limit: 25 })}</section>`;
-    }
-  };
+  /* ================================================================ PROFIL STAF + ANALISIS JURANG */
+  function profileHTML(s, d) {
+    const sk = s.sk, b = band(sk);
+    const meta = [['Bidang Kepakaran', s.kepakaran || s.rg || 'Belum direkod'], ['Niche Area FKM', s.niche || 'Belum direkod'],
+      ['Tempoh Perkhidmatan', s.tempoh !== null ? s.tempoh + ' tahun' : '—'], ['Target Career Position', sk.sasaran],
+      ['Research Group', (s.rgKod || '—') + ' · ' + (s.rgPeranan || '—')], ['Research Alliance', s.alliance || '—'],
+      ['Kelayakan Tertinggi', s.kelayakan || '—'], ['Umur / Kohort', (s.umur || '—') + ' · Kohort ' + (s.kohort || '—')],
+      ['Lantikan Pertama', s.lantikPertama || '—'], ['Lantikan Jawatan Kini', s.lantikKini || '—'],
+      ['Tamat Perkhidmatan', s.tamat || '—'], ['Scopus ID', s.scopusId || '—'],
+      ['E-mel', s.email || '—'], ['Warganegara', (s.warga || '—') + ' · ' + (s.negara || '—')],
+      ['LPPT 2025 / 2024 / 2023', s.lppt.map((x) => (x === null ? '—' : x)).join(' / ')], ['Sumber Data', (s.sumber || '—') + (s.cvTarikh ? ' · CV ' + s.cvTarikh : '')]];
+    const stats = [['Publication', s.pub, '--brand'], ['Q1 + Q2', s.q1 + s.q2, '--purple'], ['Sitasi', fmtNum(s.sitasi), '--teal'],
+      ['Indeks-H', s.hindex, '--amber'], ['Geran (Aktif)', s.geran + ' (' + s.geranAktif + ')', '--green'],
+      ['Penyeliaan PhD', s.phd, '--red'], ['Penyeliaan Sarjana', s.ms, '--brand'],
+      ['Jam Latihan', fmtNum(s.jamLatihan), '--purple'], ['Dana Geran (RM)', Math.round(s.dana / 1000) + 'k', '--teal'],
+      ['Perundingan', s.perundingan + ' projek', '--brand'], ['Nilai Perundingan', Math.round(s.nilaiPerundingan / 1000) + 'k', '--green'],
+      ['Jam Ajar (UG+PG)', s.ajarUg + s.ajarPg, '--purple'], ['Anugerah', anugerah(s), '--amber'],
+      ['LPPT Purata', sk.lppt === null ? '—' : sk.lppt, '--red']];
+    return html`<div class="fk-card" style="margin-bottom:16px"><div class="fk-prof-head"><div class="fk-prof-av">${(s.nama || '?').charAt(0)}</div>
+      <div style="flex:1;min-width:200px"><h3>${fkm.fullName(s)}</h3><p>${s.jp || s.jawatan || '—'} · ${s.jabatan} — ${fkm.dept(d, s.jabatan)}</p>
+      <div style="margin-top:9px;display:flex;gap:7px;flex-wrap:wrap"><span class="fk-badge b-blue">${s.jawatan || '—'}</span><span class="fk-badge b-grey">${s.gred || '—'}</span>${statusBadge(s)}
+      <span class="fk-badge ${b[1]}">${b[0]} · ${sk.total}%</span>${s.aktif ? '' : html`<span class="fk-badge b-red">${s.status}</span>`}</div></div></div>
+      <div class="fk-meta-grid">${meta.map((m) => html`<div class="fk-meta"><span>${m[0]}</span><strong>${m[1]}</strong></div>`)}</div></div>
+      <div class="fk-grid3">${stats.map((k) => kpi(k[1], k[0], k[2]))}</div>`;
+  }
 
-  KD.views.fkmAnalitik = {
-    async render(el, params, query) {
-      const tab = TAB_RENDER[query.tab] ? query.tab : 'latihan';
-      return withData(el, 'Analitik', 'Latihan, penyelidikan, geran, penyeliaan dan khidmat', (body, d) => {
-        const st = fkm.all(d);
-        body.innerHTML = html`<div class="segmented" role="tablist" aria-label="Analitik">${TABS.map((t) => html`<button role="tab" aria-pressed="${t[0] === tab ? 'true' : 'false'}" data-tab="${t[0]}">${t[1]}</button>`)}</div>
-          <div class="mt-6">${TAB_RENDER[tab](st, d)}</div>`.s;
-        on(body, 'click', '[data-tab]', (e, b) => KD.router.go(fkm.base() + '/analitik?tab=' + b.dataset.tab));
-      });
-    }
-  };
+  function gapCard(s, d) {
+    const sk = s.sk, b = band(sk), W = d.cfg.bobot, M = d.cfg.minimum;
+    const comps = [['Penyelidikan & Penerbitan', sk.r, W.penyelidikan, M.penyelidikan], ['Pengajaran & Penyeliaan', sk.t, W.pengajaran, M.pengajaran],
+      ['Khidmat & Perundingan Industri', sk.k, W.khidmat, M.khidmat], ['Sanjungan & Kepimpinan', sk.l, W.kepimpinan, M.kepimpinan]];
+    return html`<div class="fk-card"><div class="fk-card-title">Promotion Readiness &amp; Gap Analysis</div>
+      <div class="fk-card-sub">Sasaran: <strong>${sk.sasaran}</strong> · LPPT purata ${sk.lppt === null ? '—' : sk.lppt + '%'} (min ${d.cfg.lpptMinimum}%)</div><div class="fk-score-row">${raw(ring(sk))}
+      <div style="flex:1;min-width:230px"><div style="margin-bottom:14px"><span class="fk-badge ${b[1]}">${b[0]} — ${sk.label}</span></div>
+      ${comps.map((r) => html`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;gap:8px"><span>${r[0]} <span class="fk-mini">(${r[2]}%)</span></span><strong>${r[1]}%</strong></div>
+        <div class="fk-bar"><i style="width:${r[1]}%;background:${r[1] < r[3] ? 'var(--red)' : r[1] >= r[3] + 15 ? 'var(--green)' : 'var(--amber)'}"></i></div>${r[1] < r[3] ? html`<div class="fk-mini" style="color:var(--red)">Bawah minimum ${r[3]}%</div>` : ''}</div>`)}
+      </div></div><div class="fk-section-h">Gap Analysis</div><ul class="fk-gap-list">${s.jurang.map((g) => html`<li><span class="fk-badge b-amber">${g[0]}</span><span>${g[1]}</span></li>`)}</ul></div>`;
+  }
 
-  /* ================================================================ PENASIHAT KERJAYA (berasaskan peraturan, dalam pelayar) */
+  /** Butang pentadbir pada profil (sunting, nyahaktif / lantik semula). */
+  function adminBar(s, d) {
+    if (d.access.peranan !== 'ADMIN') return '';
+    return html`<div class="fk-btn-row"><a class="fk-btn" href="#/admin/staf/${s.id}/sunting">✎ Sunting Maklumat</a>
+      ${s.aktif ? html`<button class="fk-btn danger" data-act="fk-deact" data-id="${s.id}">⛔ Nyahaktifkan Staf</button>` : html`<button class="fk-btn" data-act="fk-react" data-id="${s.id}">↻ Lantik Semula</button>`}
+      <a class="fk-btn" href="#/admin/staf/${s.id}">☷ Rekod &amp; Audit</a></div>
+      ${s.aktif ? '' : html`<div class="fk-alert red">Rekod ini <strong>tidak aktif</strong> (status: ${s.status}). Ia dikecualikan daripada semua KPI, carta dan skor kesiapsiagaan.</div>`}`;
+  }
+
+  function bindAdmin(root, d) {
+    on(root, 'click', '[data-act="fk-deact"]', (e, btn) => {
+      const s = d.staff.filter((x) => x.id === btn.getAttribute('data-id'))[0];
+      if (!s) return;
+      const m = KD.moduleOf('staf');
+      const opts = ((m && m.statuses) || []).filter((x) => x.value !== 'AKTIF');
+      const b = modal.show(html`<div class="fk-card-title" style="font-size:17px">Nyahaktifkan Staf</div><div class="fk-card-sub">${fkm.fullName(s)} · ID ${s.sid}</div>
+        <div class="fk-alert">Staf tidak aktif dikecualikan daripada KPI dan carta. Capaian &amp; akaun log masuk staf ini juga dinyahaktif serta-merta.</div>
+        <form data-fk-st><label class="fk-lbl" for="fkSt">Status baharu</label><select id="fkSt" name="status">${opts.map((o) => html`<option value="${o.value}">${o.label}</option>`)}</select>
+        <label class="fk-lbl" for="fkStN">Catatan</label><input type="text" id="fkStN" name="note" maxlength="200" placeholder="cth. Bersara wajib 1 Nov 2026">
+        <button class="fk-btn-primary fk-btn-block" type="submit" style="margin-top:18px">Sahkan</button></form>`, true);
+      on(b, 'submit', '[data-fk-st]', (ev, form) => { ev.preventDefault(); applyStatus(s, form.status.value, form.note.value.trim() || 'Dinyahaktif melalui profil', qs('button', form)); });
+    });
+    on(root, 'click', '[data-act="fk-react"]', (e, btn) => {
+      const s = d.staff.filter((x) => x.id === btn.getAttribute('data-id'))[0];
+      if (s) applyStatus(s, 'AKTIF', 'Dilantik semula', btn);
+    });
+  }
+  function applyStatus(s, status, noteText, btn) {
+    KD.ui.busy(btn, async () => {
+      try {
+        await KD.api.setStatus('staf', s.id, status, noteText);
+        fkm.invalidate(); modal.close();
+        toast(status === 'AKTIF' ? 'Staf diaktifkan semula.' : 'Status staf dikemas kini.');
+        KD.router.render();
+      } catch (err) { toastError(err); }
+    });
+  }
+
+  function openProfile(d, sid) {
+    const s = fkm.find(d, sid);
+    if (!s) return;
+    const b = modal.show(html`${adminBar(s, d)}${profileHTML(s, d)}${gapCard(s, d)}`);
+    if (b) bindAdmin(b, d);
+  }
+
+  function renderOwnProfile(w, d) {
+    const s = fkm.find(d, d.access.skop);
+    setTitle('Staff Profile', 'Profil, pencapaian dan analisis jurang anda');
+    if (!s) { w.innerHTML = emptyCard('Profil tidak dijumpai', 'Rekod staf bagi akaun anda belum wujud. Hubungi Unit IT FKM.').s; return; }
+    w.innerHTML = html`${profileHTML(s, d)}${gapCard(s, d)}`.s;
+  }
+
+  /* ================================================================ 1. EXECUTIVE DASHBOARD (/utama) */
+  function renderExec(w, d) {
+    const st = vis(d);
+    const ready = st.filter((s) => s.sk.jalur !== 'MERAH').length;
+    const byRank = grp(st, (s) => s.jawatan), byDept = grp(st, (s) => s.jabatan);
+    w.innerHTML = html`<div class="fk-kpi-grid">
+        ${kpi(fmtNum(st.length), 'Jumlah Staf Akademik', '--brand', '☻')}${kpi(st.filter(isProf).length, 'Profesor', '--purple', '♛')}
+        ${kpi(st.filter(isMadya).length, 'Profesor Madya', '--teal', '♜')}${kpi(ready, 'Hampir/Layak Naik Pangkat', '--green', '▲')}
+        ${kpi(fmtNum(Math.round(sum(st, (s) => s.jamLatihan))), 'Jumlah Jam Latihan', '--amber', '⏱')}${kpi(fmtNum(sum(st, (s) => s.pub)), 'Jumlah Publication', '--brand', '▤')}
+        ${kpi(fmtNum(sum(st, (s) => s.geranAktif)), 'Geran Aktif', '--red', '◉')}</div>
+      <div class="fk-grid2">${chartCard('Staff Distribution by Grade', 'Taburan mengikut gred jawatan akademik', 'c1')}${chartCard('Staff Distribution by Department', 'Taburan mengikut jabatan FKM', 'c2')}</div>
+      <div class="fk-grid2">${chartCard('Promotion Readiness Trend', 'Purata skor kesiapsiagaan mengikut jabatan', 'c3')}${chartCard('Training Completion', 'Peratus pematuhan mengikut kategori latihan', 'c4')}</div>
+      ${chartCard('Research Performance Trend', 'Penerbitan terkumpul FKM mengikut tahun', 'c5')}`.s;
+    const min = d.cfg.latihanMinJam;
+    mk(w, 'c1', 'bar', { labels: Object.keys(byRank), datasets: [{ data: Object.values(byRank), backgroundColor: PAL(), borderRadius: 8, maxBarThickness: 44 }] }, { plugins: { legend: { display: false } } });
+    mk(w, 'c2', 'doughnut', { labels: Object.keys(byDept), datasets: [{ data: Object.values(byDept), backgroundColor: PAL(), borderWidth: 0 }] },
+      { cutout: '62%', plugins: { legend: { position: window.innerWidth < 640 ? 'bottom' : 'right', labels: { color: cssv('--muted'), font: { size: 11 }, boxWidth: 12, padding: 12 } } } });
+    const dp = Object.keys(byDept);
+    mk(w, 'c3', 'bar', { labels: dp, datasets: [{ label: 'Purata Skor (%)', data: dp.map((x) => Math.round(avg(st.filter((s) => s.jabatan === x), (s) => s.sk.total))), backgroundColor: cssv('--brand'), borderRadius: 8, maxBarThickness: 40 }] }, { scales: yNoGrid(100) });
+    mk(w, 'c4', 'bar', { labels: d.latihan.map((c) => cut(c[1], 18)), datasets: [{ label: '% Pematuhan', data: d.latihan.map((c) => pct(st.filter((s) => (s.latihan[c[0]] || 0) >= min).length, st.length)), backgroundColor: PAL(), borderRadius: 8 }] },
+      { indexAxis: 'y', plugins: { legend: { display: false } }, scales: hScales(100) });
+    mk(w, 'c5', 'line', { labels: YEARS, datasets: [{ label: 'Penerbitan', data: YEARS.map((y) => sum(st, (s) => s.trend[y])), borderColor: cssv('--brand'), backgroundColor: cssv('--brand-soft'), fill: true, tension: 0.4, borderWidth: 3, pointRadius: 5, pointBackgroundColor: cssv('--brand') }] });
+  }
+  KD.views.dashboard = page((w, d) => (d.access.peranan === 'STAFF' ? renderOwnProfile(w, d) : renderExec(w, d)));
+
+  /* ================================================================ 2. STAFF PROFILE */
+  KD.views.fkmStaf = page((w, d, params, query) => {
+    if (d.access.peranan === 'STAFF') return renderOwnProfile(w, d);
+    const base = fkm.all(d, true);
+    const off = base.filter((s) => !s.aktif).length;
+    const ranks = Object.keys(grp(base, (s) => s.jawatan)).sort();
+    const stats = Object.keys(grp(base, (s) => s.khidmat)).sort();
+    w.innerHTML = html`<div class="fk-toolbar"><input type="search" data-q placeholder="Cari nama, ID staf, e-mel atau bidang kepakaran…" aria-label="Cari staf" value="${query.q || ''}">
+        <select data-f="jabatan" aria-label="Jabatan"><option value="">Semua Jabatan</option>${dl(base).map((x) => html`<option value="${x}">${x}</option>`)}</select>
+        <select data-f="jawatan" aria-label="Gred"><option value="">Semua Gred</option>${ranks.map((x) => html`<option value="${x}">${x}</option>`)}</select>
+        <select data-f="khidmat" aria-label="Status"><option value="">Semua Status</option>${stats.map((x) => html`<option value="${x}">${x}</option>`)}</select>
+        ${d.access.peranan === 'ADMIN' ? html`<a class="fk-btn-primary fk-btn-block" href="#/admin/staf/baru">+ Tambah Staf</a>` : ''}</div>
+      ${off ? html`<div class="fk-mini fk-inline" style="margin:-6px 0 14px"><label class="fk-check"><input type="checkbox" data-off ${SHOW_OFF ? raw('checked') : ''}><span>Tunjuk staf tidak aktif</span></label>
+        <span class="fk-badge b-grey">${off} tidak aktif ${SHOW_OFF ? '(sedang dipaparkan)' : 'disembunyikan'}</span></div>` : ''}
+      <div class="fk-card"><div class="fk-card-title">Direktori Staf Akademik</div><div class="fk-card-sub" data-count></div><div data-tbl></div></div>`.s;
+    const draw = () => {
+      const q = qs('[data-q]', w).value.trim().toLowerCase();
+      const f = {}; qsa('[data-f]', w).forEach((el) => { f[el.getAttribute('data-f')] = el.value; });
+      const rows = vis(d).filter((s) => (!f.jabatan || s.jabatan === f.jabatan) && (!f.jawatan || s.jawatan === f.jawatan) && (!f.khidmat || s.khidmat === f.khidmat) &&
+        (!q || [s.nama, s.sid, s.email, s.kepakaran, s.niche, s.rg].join(' ').toLowerCase().indexOf(q) >= 0));
+      qs('[data-count]', w).textContent = rows.length + ' daripada ' + vis(d).length + ' rekod · klik baris untuk profil penuh';
+      qs('[data-tbl]', w).innerHTML = tbl(['Staf', 'Jabatan', 'Gred', 'Jawatan', 'Perkhidmatan', 'Status', 'Readiness'], rows.map((s) => html`<tr data-sid="${s.sid}" class="${s.aktif ? '' : 'off'}">
+          <td><strong>${fkm.fullName(s)}</strong><div class="fk-mini">${s.email || '—'} · ID ${s.sid}</div></td><td>${dept(s)}</td><td>${s.gred || '—'}</td><td>${s.jp || '—'}</td>
+          <td>${s.tempoh !== null ? s.tempoh + ' thn' : '—'}</td><td>${statusBadge(s)}</td><td>${bar(s.sk.total, band(s.sk)[2])}</td></tr>`)).s;
+    };
+    on(w, 'input', '[data-q]', debounce(draw, 150));
+    on(w, 'change', '[data-f]', draw);
+    on(w, 'change', '[data-off]', (e, c) => { SHOW_OFF = c.checked; KD.router.render(); });
+    draw();
+  });
+
+  KD.views.fkmProfil = page((w, d, params) => {
+    const s = fkm.find(d, params.sid);
+    if (!s) { w.innerHTML = emptyCard('Profil tidak dijumpai', 'Rekod ini tiada atau di luar skop capaian anda.', html`<a class="fk-btn" href="#/fkm/staf">← Direktori staf</a>`).s; return; }
+    setTitle('Staff Profile', fkm.fullName(s));
+    w.innerHTML = html`${d.access.peranan !== 'STAFF' ? html`<div class="fk-btn-row"><a class="fk-btn" href="#/fkm/staf">← Direktori staf</a></div>` : ''}${adminBar(s, d)}${profileHTML(s, d)}${gapCard(s, d)}`.s;
+    bindAdmin(w, d);
+  });
+
+  /* ================================================================ 3. PROMOTION READINESS */
+  KD.views.fkmKenaikan = page((w, d) => {
+    if (d.access.peranan === 'STAFF') { const me = fkm.find(d, d.access.skop); w.innerHTML = me ? gapCard(me, d).s : emptyCard('Profil tidak dijumpai', '').s; return; }
+    const st = vis(d).map((s) => s).sort((a, b) => b.sk.total - a.sk.total);
+    const g = st.filter((s) => s.sk.jalur === 'HIJAU').length, y = st.filter((s) => s.sk.jalur === 'KUNING').length, r = st.length - g - y;
+    const W = d.cfg.bobot;
+    w.innerHTML = html`<div class="fk-kpi-grid">${kpi(g, 'GREEN · Ready to apply', '--green')}${kpi(y, 'YELLOW · Almost ready', '--amber')}${kpi(r, 'RED · Need improvement', '--red')}${kpi(Math.round(avg(st, (s) => s.sk.total)) + '%', 'Purata Skor Fakulti', '--brand')}</div>
+      <div class="fk-grid2">${chartCard('Taburan Status Kesiapsiagaan', 'Penyelidikan ' + W.penyelidikan + '% · Pengajaran ' + W.pengajaran + '% · Khidmat ' + W.khidmat + '% · Kepimpinan ' + W.kepimpinan + '% · Min LPPT ' + d.cfg.lpptMinimum + '%', 'p1')}
+        ${chartCard('Purata Komponen Skor', 'Kekuatan dan kelemahan kolektif fakulti', 'p2')}</div>
+      ${card('Senarai Kesiapsiagaan Staf', 'Disusun mengikut skor tertinggi · klik untuk gap analysis penuh · Hijau ≥ ' + d.cfg.jalur.hijau + '%, Kuning ≥ ' + d.cfg.jalur.kuning + '%',
+        tbl(['Staf', 'Jabatan', 'Sasaran', 'Skor', 'Status', 'Gap Utama'], st.map((s) => html`<tr data-sid="${s.sid}"><td><strong>${fkm.fullName(s)}</strong></td><td>${dept(s)}</td><td>${s.sk.sasaran}</td>
+          <td>${bar(s.sk.total, band(s.sk)[2])}</td><td><span class="fk-badge ${band(s.sk)[1]}">${band(s.sk)[0]}</span></td><td class="fk-mini">${s.jurang[0][0]}</td></tr>`)))}`.s;
+    mk(w, 'p1', 'doughnut', { labels: ['GREEN — Ready', 'YELLOW — Almost', 'RED — Improve'], datasets: [{ data: [g, y, r], backgroundColor: [cssv('--green'), cssv('--amber'), cssv('--red')], borderWidth: 0 }] }, { cutout: '62%', plugins: legendBottom() });
+    mk(w, 'p2', 'radar', { labels: ['Penyelidikan', 'Pengajaran', 'Khidmat', 'Kepimpinan'], datasets: [{ label: 'Purata Fakulti', data: ['r', 't', 'k', 'l'].map((k) => Math.round(avg(st, (s) => s.sk[k]))),
+      borderColor: cssv('--brand'), backgroundColor: cssv('--brand-soft'), borderWidth: 2, pointBackgroundColor: cssv('--brand') }] },
+    { scales: { r: { beginAtZero: true, max: 100, grid: { color: cssv('--border') }, angleLines: { color: cssv('--border') }, pointLabels: { color: cssv('--muted'), font: { size: 11 } }, ticks: { display: false } } } });
+  });
+
+  /* ================================================================ 4. TRAINING INTELLIGENCE */
+  KD.views.fkmLatihan = page((w, d) => {
+    const st = vis(d), cats = d.latihan, min = d.cfg.latihanMinJam;
+    const comp = cats.map((c) => pct(st.filter((s) => (s.latihan[c[0]] || 0) >= min).length, st.length));
+    const mand = st.filter((s) => s.wajib).length;
+    const total = sum(st, (s) => s.jamLatihan);
+    w.innerHTML = html`<div class="fk-kpi-grid">${kpi(fmtNum(Math.round(total)), 'Jumlah Jam Latihan', '--brand')}${kpi((st.length ? total / st.length : 0).toFixed(1), 'Purata Jam / Staf', '--teal')}
+        ${kpi(pct(mand, st.length) + '%', 'Pematuhan Latihan Wajib', '--green')}${kpi(st.length - mand, 'Staf Belum Patuh', '--red')}</div>
+      ${card('Training Compliance by Category', 'Peratus staf mencapai minimum ' + min + ' jam bagi setiap kategori',
+        html`${cats.map((c, i) => html`<div style="margin-bottom:13px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><strong>${c[1]}</strong><span>${comp[i]}%</span></div>
+          <div class="fk-bar" style="height:9px"><i style="width:${comp[i]}%;background:${comp[i] >= 70 ? 'var(--green)' : comp[i] >= 45 ? 'var(--amber)' : 'var(--red)'}"></i></div></div>`)}`, '')}
+      <div style="height:16px"></div>
+      <div class="fk-grid2">${chartCard('Jumlah Jam Mengikut Kategori', 'Agregat jam latihan seluruh skop', 't1')}${chartCard('Purata Jam Latihan Mengikut Jabatan', 'Perbandingan komitmen latihan antara jabatan', 't2')}</div>
+      ${card('Rekod Latihan Staf', 'Jam terkumpul mengikut kategori',
+        tbl(['Staf', 'Jabatan'].concat(cats.map((c) => c[1].split(' ')[0]), ['Jumlah', 'Wajib']), st.slice().sort((a, b) => b.jamLatihan - a.jamLatihan).map((s) => html`<tr data-sid="${s.sid}"><td><strong>${s.nama}</strong></td><td>${dept(s)}</td>
+          ${cats.map((c) => html`<td>${s.latihan[c[0]] || 0}</td>`)}<td><strong>${s.jamLatihan}</strong></td><td><span class="fk-badge ${s.wajib ? 'b-green' : 'b-red'}">${s.wajib ? 'LENGKAP' : 'BELUM'}</span></td></tr>`)))}`.s;
+    mk(w, 't1', 'bar', { labels: cats.map((c) => cut(c[1], 16)), datasets: [{ data: cats.map((c) => Math.round(sum(st, (s) => s.latihan[c[0]]))), backgroundColor: PAL(), borderRadius: 8 }] },
+      { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: cssv('--faint'), font: { size: 9.5 } }, grid: { display: false } }, y: { beginAtZero: true, ticks: { color: cssv('--faint') }, grid: { color: cssv('--border') } } } });
+    const dp = dl(st);
+    mk(w, 't2', 'bar', { labels: dp, datasets: [{ label: 'Purata Jam', data: dp.map((x) => Math.round(avg(st.filter((s) => s.jabatan === x), (s) => s.jamLatihan))), backgroundColor: cssv('--teal'), borderRadius: 8, maxBarThickness: 40 }] });
+  });
+
+  /* ================================================================ 5. RESEARCH PERFORMANCE */
+  KD.views.fkmPenyelidikan = page((w, d) => {
+    const st = vis(d);
+    const q1 = sum(st, (s) => s.q1), q2 = sum(st, (s) => s.q2), pub = sum(st, (s) => s.pub);
+    w.innerHTML = html`<div class="fk-kpi-grid">${kpi(fmtNum(pub), 'Jumlah Publication', '--brand')}${kpi(fmtNum(sum(st, (s) => s.scopus)), 'Scopus Indexed', '--purple')}
+        ${kpi(fmtNum(sum(st, (s) => s.wos)), 'Web of Science', '--teal')}${kpi(fmtNum(q1), 'Q1 Publication', '--green')}${kpi(fmtNum(q2), 'Q2 Publication', '--amber')}
+        ${kpi(fmtNum(sum(st, (s) => s.sitasi)), 'Jumlah Sitasi', '--red')}${kpi(avg(st, (s) => s.hindex).toFixed(1), 'Purata Indeks-H', '--brand')}</div>
+      <div class="fk-grid2">${chartCard('Publication Trend', 'Penerbitan tahunan 2020–2025', 'r1')}${chartCard('Indexing & Quartile Breakdown', 'Taburan kualiti penerbitan', 'r2')}</div>
+      <div style="margin-bottom:16px">${chartCard('Citation Impact by Research Alliance', 'Jumlah sitasi mengikut research alliance', 'r3')}</div>
+      ${card('Top Researchers', 'Disusun mengikut indeks-H', tbl(['Staf', 'Jabatan', 'Publication', 'Q1', 'Q2', 'Scopus', 'WoS', 'Sitasi', 'Indeks-H'],
+        st.slice().sort((a, b) => b.hindex - a.hindex || b.sitasi - a.sitasi).map((s) => html`<tr data-sid="${s.sid}"><td><strong>${s.nama}</strong><div class="fk-mini">${s.scopusId ? 'Scopus ID ' + s.scopusId : 'Tiada Scopus ID'}</div></td>
+          <td>${dept(s)}</td><td>${s.pub}</td><td>${s.q1}</td><td>${s.q2}</td><td>${s.scopus}</td><td>${s.wos}</td><td>${fmtNum(s.sitasi)}</td><td><span class="fk-badge b-green">${s.hindex}</span></td></tr>`)))}`.s;
+    mk(w, 'r1', 'line', { labels: YEARS, datasets: [{ label: 'Penerbitan', data: YEARS.map((y) => sum(st, (s) => s.trend[y])), borderColor: cssv('--brand'), backgroundColor: cssv('--brand-soft'), fill: true, tension: 0.4, borderWidth: 3, pointRadius: 5, pointBackgroundColor: cssv('--brand') }] });
+    mk(w, 'r2', 'doughnut', { labels: ['Q1', 'Q2', 'Q3/Q4 & Lain'], datasets: [{ data: [q1, q2, Math.max(0, pub - q1 - q2)], backgroundColor: [cssv('--green'), cssv('--amber'), cssv('--faint')], borderWidth: 0 }] }, { cutout: '62%', plugins: legendBottom() });
+    const al = Object.keys(grp(st, (s) => s.alliance));
+    mk(w, 'r3', 'bar', { labels: al.map((a) => cut(a, 24)), datasets: [{ label: 'Sitasi', data: al.map((a) => sum(st.filter((s) => (s.alliance || 'TIDAK DINYATAKAN') === a), (s) => s.sitasi)), backgroundColor: PAL(), borderRadius: 8 }] },
+      { indexAxis: 'y', plugins: { legend: { display: false } }, scales: hScales() });
+  });
+
+  /* ================================================================ 6. GRANT MANAGEMENT */
+  KD.views.fkmGeran = page((w, d) => {
+    const st = vis(d), total = sum(st, (s) => s.dana);
+    w.innerHTML = html`<div class="fk-kpi-grid">${kpi('RM ' + (total / 1e6).toFixed(2) + 'j', 'Total Research Funding', '--green')}${kpi(fmtNum(sum(st, (s) => s.geran)), 'Jumlah Geran', '--brand')}
+        ${kpi(fmtNum(sum(st, (s) => s.geranAktif)), 'Active Grants', '--red')}${kpi(st.filter((s) => s.pi > 0).length, 'Principal Investigator Count', '--purple')}
+        ${kpi('RM ' + Math.round(st.length ? total / st.length / 1000 : 0) + 'k', 'Purata Dana / Staf', '--teal')}</div>
+      <div class="fk-grid2">${chartCard('Pembiayaan Mengikut Jabatan', 'Jumlah dana penyelidikan (RM)', 'g1')}${chartCard('Geran Aktif vs Selesai', 'Status portfolio geran fakulti', 'g2')}</div>
+      ${card('Rekod Geran Staf', 'Disusun mengikut jumlah dana', tbl(['Staf', 'Jabatan', 'Research Alliance', 'Jumlah Geran', 'Aktif', 'Sebagai PI', 'Dana (RM)'],
+        st.slice().sort((a, b) => b.dana - a.dana).map((s) => html`<tr data-sid="${s.sid}"><td><strong>${s.nama}</strong></td><td>${dept(s)}</td><td class="fk-mini">${s.alliance || 'TIDAK DINYATAKAN'}</td><td>${s.geran}</td>
+          <td><span class="fk-badge ${s.geranAktif > 0 ? 'b-green' : 'b-grey'}">${s.geranAktif}</span></td><td>${s.pi}</td><td><strong>${fmtNum(Math.round(s.dana * 100) / 100)}</strong></td></tr>`)))}`.s;
+    const dp = dl(st);
+    mk(w, 'g1', 'bar', { labels: dp, datasets: [{ label: 'Dana (RM)', data: dp.map((x) => sum(st.filter((s) => s.jabatan === x), (s) => s.dana)), backgroundColor: cssv('--green'), borderRadius: 8, maxBarThickness: 42 }] }, { plugins: { legend: { display: false } } });
+    mk(w, 'g2', 'doughnut', { labels: ['Aktif', 'Selesai'], datasets: [{ data: [sum(st, (s) => s.geranAktif), Math.max(0, sum(st, (s) => s.geran - s.geranAktif))], backgroundColor: [cssv('--brand'), cssv('--faint')], borderWidth: 0 }] }, { cutout: '62%', plugins: legendBottom() });
+  });
+
+  /* ================================================================ 7. SUPERVISION */
+  KD.views.fkmPenyeliaan = page((w, d) => {
+    const st = vis(d);
+    const P = sum(st, (s) => s.phd), M = sum(st, (s) => s.ms), PT = sum(st, (s) => s.phdTamat), MT = sum(st, (s) => s.msTamat);
+    w.innerHTML = html`<div class="fk-kpi-grid">${kpi(fmtNum(P), 'PhD Supervised', '--brand')}${kpi(fmtNum(M), 'Master Supervised', '--purple')}${kpi(fmtNum(PT), 'PhD Completed', '--green')}
+        ${kpi(fmtNum(MT), 'Master Completed', '--teal')}${kpi(fmtNum(Math.max(0, P + M - PT - MT)), 'Sedang Diselia', '--amber')}</div>
+      <div class="fk-grid2">${chartCard('Penyeliaan Mengikut Jabatan', 'PhD berbanding Sarjana', 's1')}${chartCard('Status Penyeliaan', 'Selesai berbanding sedang berjalan', 's2')}</div>
+      ${card('Rekod Penyeliaan Staf', 'Disusun mengikut jumlah pelajar diselia', tbl(['Staf', 'Jabatan', 'PhD', 'PhD Selesai', 'Sarjana', 'Sarjana Selesai', 'Kadar Graduasi'],
+        st.slice().sort((a, b) => (b.phd + b.ms) - (a.phd + a.ms)).map((s) => { const r = pct(s.phdTamat + s.msTamat, s.phd + s.ms); return html`<tr data-sid="${s.sid}"><td><strong>${s.nama}</strong></td><td>${dept(s)}</td>
+          <td>${s.phd}</td><td>${s.phdTamat}</td><td>${s.ms}</td><td>${s.msTamat}</td><td>${bar(r, 'var(--brand)', 56)}</td></tr>`; })))}`.s;
+    const dp = dl(st);
+    mk(w, 's1', 'bar', { labels: dp, datasets: [
+      { label: 'PhD', data: dp.map((x) => sum(st.filter((s) => s.jabatan === x), (s) => s.phd)), backgroundColor: cssv('--brand'), borderRadius: 7 },
+      { label: 'Sarjana', data: dp.map((x) => sum(st.filter((s) => s.jabatan === x), (s) => s.ms)), backgroundColor: cssv('--purple'), borderRadius: 7 }] });
+    mk(w, 's2', 'doughnut', { labels: ['Selesai', 'Sedang Diselia'], datasets: [{ data: [PT + MT, Math.max(0, P + M - PT - MT)], backgroundColor: [cssv('--green'), cssv('--amber')], borderWidth: 0 }] }, { cutout: '62%', plugins: legendBottom() });
+  });
+
+  /* ================================================================ 8. KHIDMAT & PERUNDINGAN */
+  KD.views.fkmKhidmat = page((w, d) => {
+    const st = vis(d);
+    w.innerHTML = html`<div class="fk-kpi-grid">${kpi(fmtNum(sum(st, (s) => s.perundingan)), 'Projek Perundingan', '--brand')}${kpi(Math.round(sum(st, (s) => s.nilaiPerundingan) / 1000) + 'k', 'Pendapatan (RM)', '--green')}
+        ${kpi(fmtNum(sum(st, khidmatAk)), 'Khidmat Akademik', '--purple')}${kpi(fmtNum(sum(st, jkAll)), 'Jawatankuasa', '--teal')}
+        ${kpi(fmtNum(sum(st, anugerah)), 'Anugerah', '--amber')}${kpi(fmtNum(sum(st, (s) => s.hakCipta)), 'Hak Cipta', '--red')}</div>
+      ${note('Data diambil daripada bahagian SUMMARY REPORT dalam CV format UTM. Menunjukkan jumlah terkumpul; butiran setiap projek (VOT, klien, kod subjek) memerlukan sambungan ke RADIS & sistem kewangan UTM (Fasa 2).')}
+      <div class="fk-grid2">${chartCard('Khidmat Akademik Mengikut Jenis', 'Pemeriksa VIVA, penilai geran & pewasit jurnal', 'sv1')}${chartCard('Jawatankuasa Mengikut Peringkat', 'Antarabangsa hingga fakulti', 'sv2')}</div>
+      <div class="fk-grid2">${chartCard('Beban Pengajaran', 'Jam kredit prasiswazah vs pascasiswazah', 'sv3')}${chartCard('Anugerah & Pengiktirafan', 'Antarabangsa, kebangsaan, UTM & hak cipta', 'sv4')}</div>
+      ${card('Rekod Khidmat & Perundingan Staf', 'Sumber: CV SUMMARY REPORT', tbl(['Staf', 'Jabatan', 'Perundingan', 'Nilai (RM)', 'Khidmat Akademik', 'Jawatankuasa', 'Jam Ajar', 'Anugerah'],
+        st.slice().sort((a, b) => b.nilaiPerundingan - a.nilaiPerundingan).map((s) => html`<tr data-sid="${s.sid}"><td><strong>${s.nama}</strong></td><td>${dept(s)}</td><td>${s.perundingan}</td>
+          <td>${Math.round(s.nilaiPerundingan / 1000)}k</td><td>${khidmatAk(s)}</td><td>${jkAll(s)}</td><td>${s.ajarUg + s.ajarPg}</td><td>${anugerah(s)}</td></tr>`)))}`.s;
+    const dp = dl(st);
+    const by = (x, f) => sum(st.filter((s) => s.jabatan === x), f);
+    mk(w, 'sv1', 'bar', { labels: dp, datasets: [
+      { label: 'Pemeriksa VIVA', data: dp.map((x) => by(x, (s) => s.vivaD + s.vivaL)), backgroundColor: cssv('--brand'), borderRadius: 7 },
+      { label: 'Penilai Geran', data: dp.map((x) => by(x, (s) => s.penilai)), backgroundColor: cssv('--purple'), borderRadius: 7 },
+      { label: 'Pewasit Jurnal', data: dp.map((x) => by(x, (s) => s.pewasit)), backgroundColor: cssv('--teal'), borderRadius: 7 }] });
+    mk(w, 'sv2', 'doughnut', { labels: ['Antarabangsa', 'Kebangsaan', 'Universiti', 'Fakulti'], datasets: [{ data: [sum(st, (s) => s.jk.a), sum(st, (s) => s.jk.k), sum(st, (s) => s.jk.u), sum(st, (s) => s.jk.f)],
+      backgroundColor: [cssv('--red'), cssv('--amber'), cssv('--brand'), cssv('--teal')], borderWidth: 0 }] }, { cutout: '60%', plugins: legendBottom() });
+    mk(w, 'sv3', 'bar', { labels: dp, datasets: [
+      { label: 'Prasiswazah (UG)', data: dp.map((x) => by(x, (s) => s.ajarUg)), backgroundColor: cssv('--brand'), borderRadius: 7 },
+      { label: 'Pascasiswazah (PG)', data: dp.map((x) => by(x, (s) => s.ajarPg)), backgroundColor: cssv('--green'), borderRadius: 7 }] });
+    mk(w, 'sv4', 'bar', { labels: ['Antarabangsa', 'Kebangsaan', 'UTM', 'Hak Cipta'], datasets: [{ label: 'Bilangan',
+      data: [sum(st, (s) => s.anugerah.a), sum(st, (s) => s.anugerah.k), sum(st, (s) => s.anugerah.u), sum(st, (s) => s.hakCipta)],
+      backgroundColor: [cssv('--red'), cssv('--amber'), cssv('--brand'), cssv('--purple')], borderRadius: 7 }] }, { plugins: { legend: { display: false } } });
+  });
+
+  /* ================================================================ 9. MyRA AUDIT SCORE (indikatif) */
+  KD.views.fkmMyra = page((w, d) => {
+    const st = vis(d);
+    const fund = sum(st, (s) => s.dana), cons = sum(st, (s) => s.nilaiPerundingan), q = sum(st, (s) => s.q1 + s.q2), phd = sum(st, (s) => s.phdTamat);
+    const per = (q + phd) / Math.max(1, st.length);
+    const stars = per >= 4 ? 5 : per >= 3 ? 4 : per >= 2 ? 3 : per >= 1 ? 2 : 1;
+    w.innerHTML = html`${note('MyRA (Malaysia Research Assessment) ialah penilaian bintang KPT. Modul ini ANGGARAN indikatif berdasarkan data sistem (geran, perundingan, Q1/Q2, graduan PhD) untuk pemantauan dalaman — bukan skor MyRA rasmi.')}
+      <div class="fk-kpi-grid">${kpi(stars + ' ⭐', 'Unjuran Bintang (indikatif)', '--amber')}${kpi('RM' + (fund / 1e6).toFixed(2) + 'j', 'Dana Penyelidikan', '--green')}
+        ${kpi('RM' + Math.round(cons / 1e3) + 'k', 'Perundingan Industri', '--teal')}${kpi(fmtNum(q), 'Penerbitan Q1/Q2', '--brand')}${kpi(fmtNum(phd), 'Graduan PhD', '--purple')}</div>
+      <div class="fk-grid2">${chartCard('Sumbangan Kriteria Mengikut Jabatan', 'Q1/Q2 + graduan PhD', 'my1')}${chartCard('Ekosistem Kewangan Penyelidikan', 'Geran vs perundingan (RM)', 'my2')}</div>
+      ${card('Penyumbang Utama Kriteria MyRA', 'Staf disusun ikut sumbangan penyelidikan (25 teratas)', tbl(['Staf', 'Jabatan', 'Perundingan (RM)', 'Geran (RM)', 'Q1/Q2', 'Graduan PhD'],
+        st.slice().sort((a, b) => (b.q1 + b.q2 + b.phdTamat) - (a.q1 + a.q2 + a.phdTamat)).slice(0, 25).map((s) => html`<tr data-sid="${s.sid}"><td><strong>${s.nama}</strong></td><td>${dept(s)}</td>
+          <td>RM${fmtNum(Math.round(s.nilaiPerundingan * 100) / 100)}</td><td>RM${fmtNum(Math.round(s.dana * 100) / 100)}</td><td>${s.q1 + s.q2}</td><td>${s.phdTamat}</td></tr>`)))}`.s;
+    const dp = dl(st);
+    const by = (x, f) => sum(st.filter((s) => s.jabatan === x), f);
+    mk(w, 'my1', 'bar', { labels: dp, datasets: [
+      { label: 'Q1/Q2', data: dp.map((x) => by(x, (s) => s.q1 + s.q2)), backgroundColor: cssv('--brand'), borderRadius: 7 },
+      { label: 'Graduan PhD', data: dp.map((x) => by(x, (s) => s.phdTamat)), backgroundColor: cssv('--purple'), borderRadius: 7 }] });
+    mk(w, 'my2', 'bar', { labels: dp, datasets: [
+      { label: 'Geran', data: dp.map((x) => by(x, (s) => s.dana)), backgroundColor: cssv('--green'), borderRadius: 7 },
+      { label: 'Perundingan', data: dp.map((x) => by(x, (s) => s.nilaiPerundingan)), backgroundColor: cssv('--teal'), borderRadius: 7 }] });
+  }, { roles: ['ADMIN', 'DEAN', 'HOD'] });
+
+  /* ================================================================ 10. AI CAREER ADVISOR (berasaskan peraturan, dalam pelayar) */
   function advise(s, d, q) {
-    const sk = s.sk, cfg = d.cfg, t = cfg.sasaran[sk.sasaran], L = q.toLowerCase();
+    const sk = s.sk, cfg = d.cfg, t = cfg.sasaran[sk.sasaran] || cfg.sasaran.DS54, L = q.toLowerCase();
     if (/latihan|training|kursus/.test(L)) {
       const weak = d.latihan.filter((c) => (s.latihan[c[0]] || 0) < cfg.latihanMinJam);
-      return 'Analisis latihan\nJumlah jam: ' + s.jamLatihan + ' · Latihan wajib: ' + (s.wajib ? 'LENGKAP' : 'BELUM LENGKAP') + '\n\n' +
-        (weak.length ? 'Kategori di bawah ' + cfg.latihanMinJam + ' jam:\n' + weak.map((c) => '• ' + c[1] + ' — ' + (s.latihan[c[0]] || 0) + ' jam').join('\n') +
-          '\n\nCadangan: utamakan ' + weak[0][1] + '.' : 'Semua kategori melepasi paras minimum. Pertimbangkan kursus lanjutan AI dan Leadership.');
+      return 'Analisis Latihan\nJumlah jam terkumpul: ' + s.jamLatihan + ' jam. Status latihan wajib: ' + (s.wajib ? 'LENGKAP' : 'BELUM LENGKAP') + '.\n\n' +
+        (weak.length ? 'Kategori di bawah paras minimum ' + cfg.latihanMinJam + ' jam:\n' + weak.map((c) => '• ' + c[1] + ' — ' + (s.latihan[c[0]] || 0) + ' jam').join('\n') +
+          '\n\nCadangan: utamakan ' + weak[0][1] + '.' : 'Semua kategori telah melepasi paras minimum. Teruskan dengan kursus lanjutan dalam Artificial Intelligence dan Leadership untuk kelebihan kompetitif.');
     }
-    if (/penyelidikan|research|penerbitan|sitasi|jurnal/.test(L)) {
-      return 'Prestasi penyelidikan\n• Penerbitan: ' + s.pub + ' (Q1 ' + s.q1 + ', Q2 ' + s.q2 + ')\n• Scopus ' + s.scopus + ' · WoS ' + s.wos + '\n• Sitasi ' + s.sitasi + ' · Indeks-H ' + s.hindex +
-        '\n\nKomponen penyelidikan: ' + sk.r + '% (bobot ' + cfg.bobot.penyelidikan + '%). ' +
-        (sk.r >= 75 ? 'Ini kekuatan utama anda.' : 'Untuk sasaran ' + sk.sasaran + ', fokus pada jurnal Q1/Q2 (sasaran ' + t.q12 + ', kini ' + (s.q1 + s.q2) + ').');
+    if (/penyelidikan|research|publication|penerbitan|sitasi|jurnal/.test(L)) {
+      return 'Prestasi Penyelidikan\n• Penerbitan: ' + s.pub + ' (Q1: ' + s.q1 + ', Q2: ' + s.q2 + ')\n• Scopus: ' + s.scopus + ' · WoS: ' + s.wos + '\n• Sitasi: ' + s.sitasi + ' · Indeks-H: ' + s.hindex +
+        '\n\nKomponen Penyelidikan & Penerbitan anda: ' + sk.r + '% (wajaran ' + cfg.bobot.penyelidikan + '%). ' +
+        (sk.r >= 75 ? 'Ini kekuatan utama anda — pastikan ia didokumentasikan dengan jelas dalam borang permohonan.' : 'Untuk sasaran ' + sk.sasaran + ', tumpukan pada jurnal Q1/Q2 (sasaran ' + t.q12 + ', kini ' + (s.q1 + s.q2) + ').');
     }
     if (/lama|tempoh|bila|berapa/.test(L)) {
-      const recent = (s.trend['2024'] || 0) + (s.trend['2025'] || 0);
-      const rate = Math.max(1, recent / 2);
+      const rate = Math.max(1, ((s.trend['2024'] || 0) + (s.trend['2025'] || 0)) / 2);
       const need = Math.max(0, t.pub - s.pub);
-      return 'Anggaran tempoh\nKadar penerbitan 2 tahun terkini: ~' + rate.toFixed(1) + ' setahun. Jurang penerbitan untuk ' + sk.sasaran + ': ' + need + '.\n' +
+      return 'Anggaran Tempoh\nKadar penerbitan 2 tahun terkini: ~' + rate.toFixed(1) + ' setahun. Jurang penerbitan untuk ' + sk.sasaran + ': ' + need + '.\n' +
         (need ? 'Anggaran ' + Math.ceil(need / rate) + ' tahun pada kadar semasa.' : 'Jurang penerbitan sudah ditutup.') +
-        '\n\nBoleh dipendekkan dengan kolaborasi antarabangsa (Q1), memohon geran sebagai PI, dan penyeliaan bersama PhD.';
+        '\n\nTempoh ini boleh dipendekkan dengan: (1) kolaborasi antarabangsa untuk mempercepat penerbitan Q1, (2) memohon geran sebagai Principal Investigator, (3) penyeliaan bersama pelajar PhD.';
     }
-    return 'Kesiapsiagaan — ' + fkm.fullName(s) + '\nSkor: ' + sk.total + '% · ' + sk.jalur + ' (' + sk.label + ') · Sasaran ' + sk.sasaran +
-      '\n\nPecahan:\n• Penyelidikan: ' + sk.r + '%\n• Pengajaran: ' + sk.t + '%\n• Khidmat: ' + sk.k + '%\n• Kepimpinan: ' + sk.l + '%' +
+    return 'Analisis Kesiapsiagaan — ' + fkm.fullName(s) + '\nReadiness semasa: ' + sk.total + '% · Status: ' + band(sk)[0] + ' (' + sk.label + ') · Sasaran: ' + sk.sasaran +
+      '\n\nPecahan skor:\n• Penyelidikan & Penerbitan (' + cfg.bobot.penyelidikan + '%): ' + sk.r + '%\n• Pengajaran & Penyeliaan (' + cfg.bobot.pengajaran + '%): ' + sk.t + '%\n• Khidmat & Perundingan Industri (' + cfg.bobot.khidmat + '%): ' + sk.k + '%\n• Sanjungan & Kepimpinan (' + cfg.bobot.kepimpinan + '%): ' + sk.l + '%' +
       (sk.gagal.length ? '\n\nAmaran: ' + sk.gagal.join('; ') : '') + '\n\nCadangan:\n' + s.jurang.slice(0, 4).map((g, i) => (i + 1) + '. ' + g[0] + ': ' + g[1]).join('\n');
   }
 
-  KD.views.fkmPenasihat = {
-    async render(el) {
-      return withData(el, 'Penasihat Kerjaya', 'Analisis berasaskan peraturan daripada data profil', (body, d) => {
-        const list = fkm.all(d, true).slice().sort((a, b) => a.nama.localeCompare(b.nama));
-        const QUICK = ['Apa yang saya perlukan untuk naik pangkat?', 'Bagaimana prestasi penyelidikan saya?', 'Latihan apa yang saya perlu ambil?', 'Berapa lama lagi untuk layak?'];
-        body.innerHTML = html`<div class="grid grid-main-side">
-          <section class="panel"><div class="chips">${QUICK.map((x) => html`<button class="chip" data-ask="${x}">${x}</button>`)}</div>
-            <div class="fkm-chat mt-4" data-chat aria-live="polite"></div>
-            <form class="row mt-4" data-form style="gap:8px"><input class="input grow" data-in placeholder="Tanya tentang kerjaya akademik…" aria-label="Soalan" maxlength="300"><button class="btn btn-primary" type="submit">${icon('send')}Hantar</button></form></section>
-          <section class="panel"><label class="label" for="fkmAdv">Staf dianalisis</label>
-            <select class="select" id="fkmAdv" data-who ${list.length < 2 ? 'disabled' : ''}>${list.map((s) => html`<option value="${s.sid}">${s.nama}</option>`)}</select>
-            <div class="mt-4" data-card></div></section></div>`.s;
-        const chat = qs('[data-chat]', body);
-        const who = () => fkm.find(d, qs('[data-who]', body).value);
-        const push = (me, text) => { const m = document.createElement('div'); m.className = 'fkm-msg' + (me ? ' me' : ''); m.textContent = text; chat.appendChild(m); chat.scrollTop = chat.scrollHeight; };
-        const reset = () => {
-          const s = who();
-          qs('[data-card]', body).innerHTML = html`<div style="text-align:center">${raw(ring(s.sk))}<div class="mt-3">${jalurBadge(s.sk, true)}</div><p class="small muted mt-3">Sasaran ${s.sk.sasaran}</p></div>`.s;
-          chat.innerHTML = '';
-          push(false, 'Profil aktif: ' + fkm.fullName(s) + ' (' + s.jabatan + '). Skor semasa ' + s.sk.total + '%. Pilih soalan pantas atau taip soalan anda.');
-        };
-        const ask = (q) => { if (!q) return; push(true, q); const s = who(); setTimeout(() => push(false, advise(s, d, q)), 200); };
-        on(body, 'change', '[data-who]', reset);
-        on(body, 'click', '[data-ask]', (e, b) => ask(b.dataset.ask));
-        on(body, 'submit', '[data-form]', (e) => { e.preventDefault(); const i = qs('[data-in]', body); ask(i.value.trim()); i.value = ''; });
-        reset();
-      });
-    }
-  };
+  KD.views.fkmPenasihat = page((w, d) => {
+    const list = fkm.all(d, true).slice().sort((a, b) => a.nama.localeCompare(b.nama));
+    const QUICK = [['Apakah yang saya perlukan untuk naik pangkat?', 'Apa saya perlu untuk naik pangkat?'], ['Bagaimana prestasi penyelidikan saya?', 'Prestasi penyelidikan saya'],
+      ['Latihan apa yang saya perlu ambil?', 'Latihan disyorkan'], ['Berapa lama lagi untuk saya layak?', 'Anggaran tempoh']];
+    const mine = d.access.peranan === 'STAFF' ? d.access.skop : '';
+    w.innerHTML = html`<div class="fk-ai-grid">
+      <div class="fk-card"><div class="fk-card-title">AI Career Advisor</div><div class="fk-card-sub">Analisis profil, penerbitan, geran, latihan dan penyeliaan (berasaskan peraturan daripada data sistem)</div>
+        <div class="fk-chips">${QUICK.map((x) => html`<button class="fk-chip" data-ask="${x[0]}">${x[1]}</button>`)}</div>
+        <div class="fk-chat" data-chat aria-live="polite"></div>
+        <form class="fk-ask-row" data-form><input type="text" data-in placeholder="Tanya apa sahaja tentang kerjaya akademik anda…" aria-label="Soalan" maxlength="300"><button type="submit">Hantar</button></form></div>
+      <div><div class="fk-card" style="margin-bottom:16px"><div class="fk-card-title">Staf Dianalisis</div><div class="fk-card-sub">Pilih staf untuk analisis AI</div>
+        <select data-who aria-label="Staf dianalisis" ${mine || list.length < 2 ? raw('disabled') : ''}>${list.map((s) => html`<option value="${s.sid}" ${s.sid === mine ? raw('selected') : ''}>${s.nama}</option>`)}</select>
+        <div data-card style="margin-top:16px"></div></div></div></div>`.s;
+    const chat = qs('[data-chat]', w);
+    const who = () => fkm.find(d, qs('[data-who]', w).value);
+    const push = (me, text) => { const m = document.createElement('div'); m.className = 'fk-msg ' + (me ? 'me' : 'ai'); m.textContent = text; chat.appendChild(m); chat.scrollTop = chat.scrollHeight; };
+    const reset = () => {
+      const s = who();
+      if (!s) return;
+      qs('[data-card]', w).innerHTML = html`<div style="text-align:center">${raw(ring(s.sk, 104, false))}<div style="margin-top:10px"><span class="fk-badge ${band(s.sk)[1]}">${band(s.sk)[0]}</span></div>
+        <p class="fk-mini" style="margin-top:9px">Sasaran: <strong>${s.sk.sasaran}</strong></p></div>`.s;
+      chat.innerHTML = '';
+      push(false, 'Selamat datang ke AI Career Advisor FKM. Profil aktif: ' + fkm.fullName(s) + ' (' + s.jabatan + '). Readiness semasa: ' + s.sk.total + '%. Tanya saya apa sahaja, atau pilih soalan pantas di atas.');
+    };
+    const ask = (q) => { if (!q) return; push(true, q); const s = who(); setTimeout(() => push(false, advise(s, d, q)), 320); };
+    on(w, 'change', '[data-who]', reset);
+    on(w, 'click', '[data-ask]', (e, b) => ask(b.getAttribute('data-ask')));
+    on(w, 'submit', '[data-form]', (e) => { e.preventDefault(); const i = qs('[data-in]', w); ask(i.value.trim()); i.value = ''; });
+    reset();
+  });
 
-  /* ================================================================ AUTO-EXTRACT CV (pentadbir) */
+  /* ================================================================ 11. USER ACCESS CONTROL (pentadbir) */
+  KD.views.fkmCapaian = page(async (w) => {
+    const roles = [['Admin PSM', 'ADMIN', 'Manage semua data — cipta, kemas kini, padam rekod semua modul (peranan akaun Pentadbir di Panel Pentadbir → Pengguna)'],
+      ['Dekan', 'DEAN', 'View semua dashboard fakulti — capaian baca sahaja'], ['Ketua Jabatan', 'HOD', 'View jabatan sendiri sahaja — data jabatan lain disekat'],
+      ['Staf Akademik', 'STAFF', 'View profil sendiri sahaja — tiada capaian data rakan sekerja']];
+    const matrix = [['Executive Dashboard', 1, 1, 1, 0], ['Staff Profile (semua)', 1, 1, 0, 0], ['Staff Profile (jabatan)', 1, 1, 1, 0], ['Staff Profile (sendiri)', 1, 1, 1, 1],
+      ['Promotion Readiness', 1, 1, 1, 1], ['Training Intelligence', 1, 1, 1, 1], ['Research Performance', 1, 1, 1, 1], ['Grant Management', 1, 1, 1, 1], ['Supervision', 1, 1, 1, 1],
+      ['Khidmat & Perundingan', 1, 1, 1, 1], ['MyRA Audit Score', 1, 1, 1, 0], ['AI Career Advisor', 1, 1, 1, 1], ['Auto-Extract CV', 1, 0, 0, 0],
+      ['Edit / Tulis Data', 1, 0, 0, 0], ['User Access Control', 1, 0, 0, 0], ['Audit Log', 1, 0, 0, 0]];
+    w.innerHTML = html`<div class="fk-alert"><strong>Nota Keselamatan:</strong> Google Sheet tidak didedahkan secara terus kepada pengguna. Semua capaian melalui pelayan yang mengesahkan token sesi dan menapis data mengikut senarai capaian di bawah — pelayar tidak pernah menerima data di luar skop. Kata laluan disimpan sebagai hash PBKDF2 bergaram + pepper sahaja. Hanya e-mel dalam senarai ini (domain UTM) boleh mendaftar.</div>
+      <div class="fk-grid2">${roles.map((r) => html`<div class="fk-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;gap:8px"><div class="fk-card-title">${r[0]}</div><span class="fk-badge b-blue">${r[1]}</span></div><p class="fk-mini" style="line-height:1.6;margin:0">${r[2]}</p></div>`)}</div>
+      <div style="margin-bottom:16px">${card('Permission Matrix', 'Kawalan capaian berasaskan peranan (RBAC) — dikuatkuasa di pelayan', tbl(['Modul / Tindakan', 'Admin PSM', 'Dekan', 'Ketua Jabatan', 'Staf'],
+        matrix.map((m) => html`<tr><td><strong>${m[0]}</strong></td>${m.slice(1).map((v) => html`<td><span class="fk-badge ${v ? 'b-green' : 'b-red'}">${v ? 'BENAR' : 'SEKAT'}</span></td>`)}</tr>`)))}</div>
+      <div class="fk-card" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:4px">
+        <div><div class="fk-card-title">Pengurusan Akaun Pengguna</div><div class="fk-card-sub" data-ua-sub>Memuatkan senarai capaian…</div></div>
+        <div class="fk-inline"><input type="search" data-ua-q placeholder="Cari e-mel / nama…" style="width:210px;padding:9px 12px;font-size:13px" aria-label="Cari pengguna"><button class="fk-btn-primary" style="padding:9px 14px;font-size:12.5px" data-act="ua-add">+ Tambah Pengguna</button></div></div>
+        <div data-ua-tbl>${tbl(['E-mel', 'Nama', 'Peranan', 'Skop', 'Status', 'Akaun', 'Tindakan'], [], 'Memuatkan…')}</div></div>
+      <div class="fk-card"><div class="fk-card-title">Audit Log</div><div class="fk-card-sub" data-al-sub>Memuatkan log aktiviti…</div><div data-al-tbl></div></div>`.s;
+
+    let rows = [];
+    const ROLE_OPTS = ['DEAN', 'HOD', 'STAFF'];
+    const akaunBadge = (u) => (!u ? html`<span class="fk-badge b-grey">Belum daftar</span>`
+      : html`<span class="fk-badge ${u.status === 'ACTIVE' ? 'b-green' : 'b-red'}">${u.status === 'ACTIVE' ? 'Berdaftar' : u.status}</span>${u.role !== 'USER' ? html` <span class="fk-badge b-purple">${u.role.replace('_', ' ')}</span>` : ''}`);
+    const drawUa = () => {
+      const q = (qs('[data-ua-q]', w).value || '').toLowerCase();
+      const list = rows.filter((u) => !q || (u.email + ' ' + u.nama).toLowerCase().indexOf(q) >= 0);
+      qs('[data-ua-sub]', w).textContent = rows.length + ' e-mel dalam senarai capaian · ' + rows.filter((u) => u.akaun).length + ' sudah mendaftar';
+      qs('[data-ua-tbl]', w).innerHTML = tbl(['E-mel', 'Nama', 'Peranan', 'Skop', 'Status', 'Akaun', 'Tindakan'], list.map((u) => html`<tr data-id="${u.id}">
+          <td class="fk-mini">${u.email}</td><td>${u.nama || '—'}</td>
+          <td><select data-ua="peranan" aria-label="Peranan">${ROLE_OPTS.map((r) => html`<option value="${r}" ${r === u.peranan ? raw('selected') : ''}>${r}</option>`)}</select></td>
+          <td><input type="text" data-ua="skop" value="${u.skop}" placeholder="${u.peranan === 'HOD' ? 'cth. KBPI' : u.peranan === 'STAFF' ? 'Staff ID' : '—'}" aria-label="Skop" style="max-width:120px"></td>
+          <td><button class="fk-badge ${u.status === 'AKTIF' ? 'b-green' : 'b-red'}" data-act="ua-toggle" title="Klik untuk togol">${u.status === 'AKTIF' ? 'ACTIVE' : 'INACTIVE'}</button></td>
+          <td>${akaunBadge(u.akaun)}</td>
+          <td style="white-space:nowrap">${u.akaun && u.akaun.role === 'USER' ? html`<button class="fk-btn" data-act="ua-reset">Pautan Reset</button>` : html`<span class="fk-mini">—</span>`}</td></tr>`), 'Tiada pengguna dipadankan.').s;
+    };
+    const load = async () => {
+      try { rows = (await KD.api.call('staf.akses')).items || []; drawUa(); } catch (err) { qs('[data-ua-sub]', w).textContent = 'Gagal memuatkan: ' + ((err && err.message) || err); }
+    };
+    const rowOf = (el) => rows.filter((u) => u.id === el.closest('tr').getAttribute('data-id'))[0];
+    const save = async (u, patch) => {
+      const p = Object.assign({ email: u.email, nama: u.nama, peranan: u.peranan, skop: u.skop, catatan: u.catatan }, patch);
+      try { await KD.api.update('capaian', u.id, p); toast('Capaian ' + u.email + ' dikemas kini.'); fkm.invalidate(); } catch (err) { toastError(err); }
+      await load();
+    };
+    on(w, 'input', '[data-ua-q]', debounce(drawUa, 150));
+    on(w, 'change', '[data-ua]', (e, el) => { const u = rowOf(el); if (!u) return; const k = el.getAttribute('data-ua'); const patch = {}; patch[k] = el.value.trim(); if (k === 'peranan' && el.value === 'DEAN') patch.skop = ''; save(u, patch); });
+    on(w, 'click', '[data-act="ua-toggle"]', (e, el) => {
+      const u = rowOf(el); if (!u) return;
+      const next = u.status === 'AKTIF' ? 'TIDAK_AKTIF' : 'AKTIF';
+      KD.ui.busy(el, async () => {
+        try { await KD.api.setStatus('capaian', u.id, next, next === 'AKTIF' ? 'Diaktifkan semula' : 'Dinyahaktif melalui User Access Control'); toast(next === 'AKTIF' ? 'Capaian diaktifkan.' : 'Capaian dinyahaktif; sesi pengguna ditamatkan.'); fkm.invalidate(); } catch (err) { toastError(err); }
+        await load();
+      });
+    });
+    on(w, 'click', '[data-act="ua-reset"]', (e, el) => {
+      const u = rowOf(el); if (!u || !u.akaun) return;
+      KD.ui.busy(el, async () => {
+        try { await KD.api.admin.sendReset(u.akaun.id); toast('Pautan tetapan semula kata laluan dihantar ke ' + u.email + '.'); } catch (err) { toastError(err); }
+      });
+    });
+    on(w, 'click', '[data-act="ua-add"]', () => {
+      const b = modal.show(html`<div class="fk-card-title" style="font-size:17px">Tambah Pengguna</div><div class="fk-card-sub">E-mel UTM ini akan dibenarkan mendaftar akaun dengan peranan dan skop yang dipilih.</div>
+        <form data-ua-form><label class="fk-lbl" for="uaE">E-mel UTM</label><input type="email" id="uaE" name="email" required placeholder="nama@utm.my" data-autofocus>
+          <label class="fk-lbl" for="uaN">Nama</label><input type="text" id="uaN" name="nama" maxlength="120">
+          <label class="fk-lbl" for="uaR">Peranan</label><select id="uaR" name="peranan">${ROLE_OPTS.map((r) => html`<option value="${r}" ${r === 'STAFF' ? raw('selected') : ''}>${r}</option>`)}</select>
+          <label class="fk-lbl" for="uaS">Skop</label><input type="text" id="uaS" name="skop" placeholder="HOD: kod jabatan (cth. KBPI) · STAFF: Staff ID (kosong = auto ikut e-mel)">
+          <label class="fk-lbl" for="uaC">Catatan</label><input type="text" id="uaC" name="catatan" maxlength="200">
+          <p class="fk-mini" data-err style="color:var(--red);min-height:16px;margin:12px 0 0"></p>
+          <button class="fk-btn-primary fk-btn-block" type="submit" style="margin-top:14px">Simpan</button></form>`, true);
+      on(b, 'submit', '[data-ua-form]', (ev, f) => {
+        ev.preventDefault();
+        KD.ui.busy(qs('button[type=submit]', f), async () => {
+          try {
+            await KD.api.create('capaian', { email: f.email.value.trim(), nama: f.nama.value.trim(), peranan: f.peranan.value, skop: f.skop.value.trim(), catatan: f.catatan.value.trim(), requestId: 'ua' + Date.now() });
+            modal.close(); toast('Pengguna ditambah ke senarai capaian.'); await load();
+          } catch (err) { qs('[data-err]', b).textContent = (err && err.message) || 'Gagal menyimpan.'; }
+        });
+      });
+    });
+    load();
+    try {
+      const res = await KD.api.admin.getAuditLogs({ pageSize: 100 });
+      const items = res.items || [];
+      qs('[data-al-sub]', w).textContent = items.length + ' entri terkini (paling baharu dahulu) · log penuh di Panel Pentadbir → Audit Log';
+      qs('[data-al-tbl]', w).innerHTML = tbl(['Masa', 'Pengguna', 'Tindakan', 'Butiran'], items.map((l) => html`<tr><td class="fk-mini" style="white-space:nowrap">${l.createdAt ? new Date(l.createdAt).toLocaleString('ms-MY', { dateStyle: 'short', timeStyle: 'short' }) : '—'}</td>
+        <td>${l.userName || '—'}</td><td><span class="fk-badge ${/FAIL|DENIED|BLOCK|DELETE/.test(l.action) ? 'b-red' : /LOGIN|REGISTER/.test(l.action) ? 'b-green' : 'b-blue'}">${l.action}</span></td><td class="fk-mini">${l.description || ''}</td></tr>`), 'Tiada rekod audit lagi.').s;
+    } catch (err) { qs('[data-al-sub]', w).textContent = 'Gagal memuatkan log: ' + ((err && err.message) || err); }
+  }, { roles: ['ADMIN'], allowEmpty: true });
+
+  /* ================================================================ 12. AUTO-EXTRACT CV (pentadbir) */
   let pdfLoading = null;
   function loadPdfJs() {
     if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
@@ -462,10 +941,10 @@
     const pdf = await lib.getDocument({ data: buf, isEvalSupported: false }).promise;
     let full = '';
     for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const tc = await page.getTextContent();
+      const pg = await pdf.getPage(i);
+      const tc = await pg.getTextContent();
       full += tc.items.map((t) => t.str).join(' ') + '\n';
-      page.cleanup();
+      pg.cleanup();
     }
     pdf.destroy();
     return full;
@@ -582,103 +1061,92 @@ function extractCVfields(fullRaw){
 /* @cv-extract:end */
   KD.fkmExtract = extractCVfields;
 
-  KD.views.fkmCv = {
-    async render(el) {
-      let batch = [];
-      el.innerHTML = html`<div class="page-head"><div><h1>Auto-Extract CV</h1><p>Muat naik CV Akademik UTM (PDF, dengan SUMMARY REPORT). Teks diekstrak dalam pelayar — fail tidak dimuat naik ke pelayan.</p></div></div>
-        <section class="panel"><div class="fkm-drop"><input type="file" accept="application/pdf" multiple hidden data-file>
-          <button class="btn btn-primary" data-act="pick">${icon('pdf')}Pilih fail PDF (maks 10)</button><p class="small muted mt-3" data-stat>Belum ada fail dipilih.</p></div>
-          <div class="alert alert-info mt-4 fkm-note"><div>Hanya staf yang <strong>sudah wujud</strong> dikemas kini (padanan Staff ID). Nilai daripada CV <strong>menggantikan</strong> nilai sedia ada bagi medan berkaitan; medan yang tiada dalam CV tidak disentuh.</div></div>
-          <div data-out class="mt-4"></div></section>`.s;
-      const out = qs('[data-out]', el), stEl = qs('[data-stat]', el), input = qs('[data-file]', el);
-      on(el, 'click', '[data-act="pick"]', () => input.click());
-      const show = () => {
-        const valid = batch.filter((b) => !b._err && b.staff_id);
-        out.innerHTML = html`<div class="table-wrap"><table class="table fkm-table"><thead><tr><th>Fail</th><th>Staff ID</th><th>Nama</th><th class="num">Penerbitan</th><th class="num">PhD</th><th class="num">Perundingan (RM)</th><th class="num">LPPT 2025</th><th>Status</th></tr></thead><tbody>
-          ${batch.map((b) => (b._err ? html`<tr><td class="small">${b._file}</td><td colspan="6" class="small">${b._err}</td><td><span class="badge badge-danger">Ditolak</span></td></tr>`
-            : html`<tr><td class="small">${b._file}</td><td><strong>${b.staff_id || '—'}</strong></td><td>${b.name || '—'}</td><td class="num">${b.pub_wos + b.pub_scopus + b.pub_conf + b.pub_book}</td>
-              <td class="num">${b.phd_grad}/${b.phd_ongoing}</td><td class="num">${fmtNum(Math.round(b.consult_rm))}</td><td class="num">${b.lppt_2025 || '—'}</td>
-              <td>${b.staff_id ? html`<span class="badge badge-success">Sedia</span>` : html`<span class="badge badge-danger">Tiada ID</span>`}</td></tr>`))}</tbody></table></div>
-          <div class="row mt-4" style="gap:10px;flex-wrap:wrap"><button class="btn btn-primary" data-act="save" ${valid.length ? '' : 'disabled'}>${icon('database')}Simpan ${valid.length} rekod</button><span class="small muted" data-res></span></div>`.s;
-      };
-      on(el, 'change', '[data-file]', async () => {
-        const files = Array.from(input.files || []);
-        if (!files.length) return;
-        if (files.length > 10) { stEl.textContent = 'Maksimum 10 fail sekali.'; return; }
-        batch = [];
-        for (let i = 0; i < files.length; i++) {
-          stEl.textContent = 'Memproses ' + (i + 1) + '/' + files.length + ': ' + files[i].name + '…';
-          try {
-            const text = await readPdfText(files[i]);
-            /* Pengadang wajib: tanpa SUMMARY REPORT semua angka jadi 0 dan akan menimpa data sebenar. */
-            if (!/SUMMARY\s+REPORT/i.test(text)) { batch.push({ _file: files[i].name, _err: 'Bukan CV Akademik Summary Report — bahagian "SUMMARY REPORT" tiada.' }); continue; }
-            const d = extractCVfields(text);
-            d._file = files[i].name; d._summary = true;
-            batch.push(d);
-          } catch (e) { batch.push({ _file: files[i].name, _err: e.message || 'Gagal membaca PDF.' }); }
-        }
-        stEl.textContent = 'Selesai memproses ' + files.length + ' fail. Semak sebelum simpan.';
-        input.value = '';
-        show();
-      });
-      on(el, 'click', '[data-act="save"]', (e, btn) => KD.ui.busy(btn, async () => {
-        const items = batch.filter((b) => !b._err && b.staff_id).map((b) => { const o = Object.assign({}, b); delete o._file; return o; });
+  KD.views.fkmCv = page((w) => {
+    let batch = [];
+    w.innerHTML = html`<div class="fk-card"><div class="fk-card-title">Auto-Extract CV (Pengekstrakan dalam Pelayar)</div>
+      <div class="fk-card-sub">Muat naik CV Akademik format UTM (PDF, dengan SUMMARY REPORT). Boleh pilih sehingga 10 fail sekali gus. Teks diekstrak dalam pelayar — fail tidak dimuat naik ke pelayan.</div>
+      <div class="fk-drop"><input type="file" accept="application/pdf" multiple hidden data-file>
+        <button class="fk-btn" data-act="pick">📄 Pilih Fail PDF CV (maks 10)</button><div class="fk-drop-stat" data-stat>Belum ada fail dipilih</div></div>
+      <div class="fk-alert">Hanya staf yang <strong>sudah wujud</strong> dikemas kini (padanan Staff ID). Nilai daripada CV <strong>menggantikan</strong> nilai sedia ada bagi medan berkaitan; medan yang tiada dalam CV tidak disentuh.</div>
+      <div data-out></div></div>`.s;
+    const out = qs('[data-out]', w), stEl = qs('[data-stat]', w), input = qs('[data-file]', w);
+    on(w, 'click', '[data-act="pick"]', () => input.click());
+    const show = () => {
+      const valid = batch.filter((b) => !b._err && b.staff_id);
+      out.innerHTML = html`<div class="fk-card-title" style="margin-top:6px">Ringkasan Pengekstrakan (${batch.length} CV)</div><div class="fk-card-sub">Semak sebelum simpan. Rekod dipadan mengikut Staff ID.</div>
+        ${tbl(['Fail', 'Staff ID', 'Nama', 'Penerbitan', 'PhD', 'Perundingan', 'LPPT 2025', 'Status'], batch.map((b) => (b._err
+          ? html`<tr style="background:rgba(220,61,61,.08)"><td class="fk-mini">${b._file}</td><td colspan="6" style="line-height:1.5">${b._err}</td><td><span class="fk-badge b-red">DITOLAK</span></td></tr>`
+          : html`<tr><td class="fk-mini">${b._file}</td><td><strong>${b.staff_id || '—'}</strong></td><td>${b.name || '—'}</td><td>${b.pub_wos + b.pub_scopus + b.pub_conf + b.pub_book}</td>
+            <td>${b.phd_grad}/${b.phd_ongoing}</td><td>RM${fmtNum(Math.round(b.consult_rm))}</td><td>${b.lppt_2025 || '—'}</td>
+            <td>${b.staff_id ? (b.lppt_2025 ? html`<span class="fk-badge b-green">OK</span>` : html`<span class="fk-badge b-amber" title="Tiada markah LPPT dalam CV">Semak</span>`) : html`<span class="fk-badge b-red">Tiada ID</span>`}</td></tr>`)))}
+        <div class="fk-inline" style="margin-top:14px"><button class="fk-btn ok" data-act="save" ${valid.length ? '' : raw('disabled')}>Simpan Semua ke Sistem (${valid.length} rekod)</button>
+          <span class="fk-mini">${batch.length - valid.length} rekod dilangkau (tiada Staff ID / ralat)</span></div><div class="fk-alert green hidden" data-res style="margin-top:14px"></div>`.s;
+    };
+    on(w, 'change', '[data-file]', async () => {
+      const files = Array.from(input.files || []);
+      if (!files.length) return;
+      if (files.length > 10) { stEl.textContent = 'Maksimum 10 fail sekali.'; return; }
+      batch = [];
+      for (let i = 0; i < files.length; i++) {
+        stEl.textContent = 'Memproses ' + (i + 1) + '/' + files.length + ': ' + files[i].name + '…';
         try {
-          const r = await KD.api.call('staf.cvSave', { items });
-          fkm.invalidate();
-          qs('[data-res]', el).textContent = r.updated + ' dikemas kini, ' + r.unchanged + ' tiada perubahan' + (r.errors.length ? ', ' + r.errors.length + ' ralat: ' + r.errors.map((x) => (x.key || '#' + x.index) + ' — ' + x.message).join('; ') : '.');
-          toast(r.errors.length ? 'Disimpan sebahagian. Semak ralat.' : 'CV berjaya disimpan.', r.errors.length ? 'error' : undefined);
-        } catch (err) { toastError(err); }
-      }));
-    }
-  };
+          const text = await readPdfText(files[i]);
+          /* Pengadang wajib: tanpa SUMMARY REPORT semua angka jadi 0 dan akan menimpa data sebenar. */
+          if (!/SUMMARY\s+REPORT/i.test(text)) { batch.push({ _file: files[i].name, _err: 'Bukan CV Akademik Summary Report — bahagian "SUMMARY REPORT" tiada.' }); continue; }
+          const x = extractCVfields(text);
+          x._file = files[i].name; x._summary = true;
+          batch.push(x);
+        } catch (e) { batch.push({ _file: files[i].name, _err: e.message || 'Gagal membaca PDF.' }); }
+      }
+      stEl.textContent = 'Selesai memproses ' + files.length + ' fail. Semak sebelum simpan.';
+      input.value = '';
+      show();
+    });
+    on(w, 'click', '[data-act="save"]', (e, btn) => KD.ui.busy(btn, async () => {
+      const items = batch.filter((b) => !b._err && b.staff_id).map((b) => { const o = Object.assign({}, b); delete o._file; return o; });
+      try {
+        const r = await KD.api.call('staf.cvSave', { items });
+        fkm.invalidate();
+        const res = qs('[data-res]', w);
+        res.classList.remove('hidden');
+        if (r.errors.length) res.classList.replace('green', 'red');
+        res.textContent = r.updated + ' dikemas kini, ' + r.unchanged + ' tiada perubahan' + (r.errors.length ? ', ' + r.errors.length + ' ralat: ' + r.errors.map((x) => (x.key || '#' + x.index) + ' — ' + x.message).join('; ') : '. Dashboard akan memaparkan data terkini.');
+        toast(r.errors.length ? 'Disimpan sebahagian. Semak ralat.' : 'CV berjaya disimpan.', r.errors.length ? 'error' : undefined);
+      } catch (err) { toastError(err); }
+    }));
+  }, { roles: ['ADMIN'], allowEmpty: true });
 
   /* ================================================================ IMPORT SISTEM LAMA (Super Admin) */
-  KD.views.fkmImport = {
-    async render(el) {
-      el.innerHTML = html`<div class="page-head"><div><h1>Import Sistem Lama</h1><p>Salin data staf & senarai capaian daripada Google Sheet sistem lama. Sheet lama hanya DIBACA — tiada perubahan dibuat padanya.</p></div></div>
-        <section class="panel"><form data-form class="form-layout">
-          <div class="field"><label class="label" for="fkmSheet">ID Google Sheet sistem lama</label><input class="input" id="fkmSheet" name="sheetId" placeholder="cth. 1AbCdEf…" autocomplete="off">
-            <p class="hint">Kosongkan untuk guna Script Property <code>LEGACY_SHEET_ID</code>. Akaun pemilik skrip mesti ada akses kepada Sheet tersebut.</p></div>
-          <div class="alert alert-info fkm-note"><div>Selamat dijalankan berulang kali: rekod dipadankan ikut Staff ID / e-mel. Kata laluan lama <strong>tidak</strong> dipindah — pengguna mendaftar semula dengan e-mel yang disenaraikan.</div></div>
-          <div><button class="btn btn-primary" type="submit">${icon('download')}Mula import</button></div></form><div data-out class="mt-6"></div></section>`.s;
-      on(el, 'submit', '[data-form]', (e) => {
-        e.preventDefault();
-        const btn = qs('button[type="submit"]', el);
-        KD.ui.busy(btn, async () => {
-          try {
-            const r = await KD.api.call('staf.importLegacy', { sheetId: qs('#fkmSheet', el).value.trim() });
-            fkm.invalidate();
-            const line = (x) => x.added + ' baharu · ' + x.updated + ' dikemas kini · ' + x.unchanged + ' tiada perubahan · ' + x.errors.length + ' ralat';
-            qs('[data-out]', el).innerHTML = html`<div class="alert alert-success"><div><strong>Import selesai.</strong><br>Staf: ${line(r.staf)}<br>Capaian: ${line(r.capaian)}</div></div>
-              ${r.staf.errors.concat(r.capaian.errors).length ? html`<h4 class="mt-4">Ralat</h4><ul class="small">${r.staf.errors.concat(r.capaian.errors).map((x) => html`<li>${x.key || '#' + x.index}: ${x.message}</li>`)}</ul>` : ''}
-              ${r.warnings.length ? html`<h4 class="mt-4">Amaran (${r.warnings.length})</h4><ul class="small">${r.warnings.map((w) => html`<li>${w}</li>`)}</ul>` : ''}`.s;
-            toast('Import selesai.');
-          } catch (err) { toastError(err); }
-        });
+  KD.views.fkmImport = page((w) => {
+    w.innerHTML = html`<div class="fk-card"><div class="fk-card-title">Import Sistem Lama</div><div class="fk-card-sub">Salin data staf (STAFF_PROFILE) & senarai capaian (USER_ACCESS) daripada Google Sheet sistem lama. Sheet lama hanya DIBACA — tiada perubahan dibuat padanya.</div>
+      <form data-form><label class="fk-lbl" for="fkmSheet">ID Google Sheet sistem lama</label><input type="text" id="fkmSheet" name="sheetId" placeholder="cth. 1AbCdEf…" autocomplete="off">
+        <p class="fk-mini" style="margin:8px 0 16px">Kosongkan untuk guna Script Property <code>LEGACY_SHEET_ID</code>. Akaun pemilik skrip mesti ada akses kepada Sheet tersebut.</p>
+        <div class="fk-alert">Selamat dijalankan berulang kali: rekod dipadankan ikut Staff ID / e-mel. Kata laluan lama <strong>tidak</strong> dipindah — pengguna mendaftar semula dengan e-mel yang disenaraikan.</div>
+        <button class="fk-btn-primary" type="submit">⇩ Mula import</button></form><div data-out style="margin-top:18px"></div></div>`.s;
+    on(w, 'submit', '[data-form]', (e) => {
+      e.preventDefault();
+      const btn = qs('button[type="submit"]', w);
+      KD.ui.busy(btn, async () => {
+        try {
+          const r = await KD.api.call('staf.importLegacy', { sheetId: qs('#fkmSheet', w).value.trim() });
+          fkm.invalidate();
+          const line = (x) => x.added + ' baharu · ' + x.updated + ' dikemas kini · ' + x.unchanged + ' tiada perubahan · ' + x.errors.length + ' ralat';
+          const errs = r.staf.errors.concat(r.capaian.errors);
+          qs('[data-out]', w).innerHTML = html`<div class="fk-alert green"><strong>Import selesai.</strong><br>Staf: ${line(r.staf)}<br>Capaian: ${line(r.capaian)}</div>
+            ${errs.length ? html`<div class="fk-section-h">Ralat</div><ul class="fk-mini">${errs.map((x) => html`<li>${x.key || '#' + x.index}: ${x.message}</li>`)}</ul>` : ''}
+            ${r.warnings.length ? html`<div class="fk-section-h">Amaran (${r.warnings.length})</div><ul class="fk-mini">${r.warnings.map((x) => html`<li>${x}</li>`)}</ul>` : ''}`.s;
+          toast('Import selesai.');
+        } catch (err) { toastError(err); }
       });
-    }
-  };
+    });
+  }, { roles: ['ADMIN'], allowEmpty: true });
 
-  /* ================================================================ LALUAN & MENU */
-  const R = (path, view, title, access, layout) => ({ path, view, title, access, layout });
-  KD.extraRoutes.push(
-    R('/fkm/staf', 'fkmStaf', 'Direktori Staf', 'user', 'app'),
-    R('/fkm/staf/:sid', 'fkmProfil', 'Profil Staf', 'user', 'app'),
-    R('/fkm/kenaikan', 'fkmKenaikan', 'Kenaikan Pangkat', 'user', 'app'),
-    R('/fkm/analitik', 'fkmAnalitik', 'Analitik', 'user', 'app'),
-    R('/fkm/penasihat', 'fkmPenasihat', 'Penasihat Kerjaya', 'user', 'app'),
-    R('/admin/fkm', 'fkmExec', 'Ringkasan Eksekutif', 'admin', 'admin'),
-    R('/admin/fkm/staf', 'fkmStaf', 'Direktori Staf', 'admin', 'admin'),
-    R('/admin/fkm/staf/:sid', 'fkmProfil', 'Profil Staf', 'admin', 'admin'),
-    R('/admin/fkm/kenaikan', 'fkmKenaikan', 'Kenaikan Pangkat', 'admin', 'admin'),
-    R('/admin/fkm/analitik', 'fkmAnalitik', 'Analitik', 'admin', 'admin'),
-    R('/admin/fkm/penasihat', 'fkmPenasihat', 'Penasihat Kerjaya', 'admin', 'admin'),
-    R('/admin/fkm/cv', 'fkmCv', 'Auto-Extract CV', 'admin', 'admin'),
-    R('/admin/fkm/import', 'fkmImport', 'Import Sistem Lama', 'super', 'admin')
-  );
-  KD.extraNav.user.push(['/fkm/staf', 'users', 'Direktori'], ['/fkm/kenaikan', 'activity', 'Kenaikan Pangkat'], ['/fkm/analitik', 'chart', 'Analitik'], ['/fkm/penasihat', 'sparkle', 'Penasihat']);
-  KD.extraNav.admin.push(['/admin/fkm', 'activity', 'Ringkasan FKM'], ['/admin/fkm/staf', 'users', 'Direktori'], ['/admin/fkm/kenaikan', 'star', 'Kenaikan Pangkat'],
-    ['/admin/fkm/analitik', 'chart', 'Analitik'], ['/admin/fkm/penasihat', 'sparkle', 'Penasihat'], ['/admin/fkm/cv', 'pdf', 'Auto-Extract CV']);
+  /* ================================================================ LALUAN */
+  const VIEW = { '/fkm/staf': 'fkmStaf', '/fkm/kenaikan': 'fkmKenaikan', '/fkm/latihan': 'fkmLatihan', '/fkm/penyelidikan': 'fkmPenyelidikan', '/fkm/geran': 'fkmGeran',
+    '/fkm/penyeliaan': 'fkmPenyeliaan', '/fkm/khidmat': 'fkmKhidmat', '/fkm/myra': 'fkmMyra', '/fkm/cv': 'fkmCv', '/fkm/penasihat': 'fkmPenasihat', '/fkm/capaian': 'fkmCapaian', '/fkm/import': 'fkmImport' };
+  NAV.forEach((n) => { if (VIEW[n[0]]) KD.extraRoutes.push({ path: n[0], view: VIEW[n[0]], access: n[5], layout: 'app', title: n[2], sub: n[3] }); });
+  KD.extraRoutes.push({ path: '/fkm/staf/:sid', view: 'fkmProfil', access: 'user', layout: 'app', title: 'Staff Profile', navPath: '/fkm/staf' });
+  /* Panel pentadbir templat: pautan kembali ke dashboard FKM */
+  KD.extraNav.admin.push(['/utama', 'activity', 'Dashboard FKM']);
 })(window.KD);
 </script>

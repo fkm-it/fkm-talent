@@ -33,6 +33,9 @@ REG_OPEN = CFG.get('ALLOW_REGISTRATION') is not False
 # Nilai khusus projek (pilihan): tools/e2e-values.json = { "<modul>": { "<medan>": "nilai", "public": { "<medan>": "nilai" } } }
 _vals = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'e2e-values.json')
 VALUES = json.load(open(_vals)) if os.path.exists(_vals) else {}
+# Shell tersuai projek (pilihan): "_e2e": { "home": "<pemilih selepas log masuk pengguna>", "adminHome": "<pemilih selepas log masuk admin>" }
+HOME = VALUES.get('_e2e', {}).get('home', '.welcome')
+ADMIN_HOME = VALUES.get('_e2e', {}).get('adminHome', '.stat')
 
 SAMPLE = {'string': 'Ujian E2E', 'text': 'Ini ialah ujian hujung-ke-hujung automatik untuk modul.', 'email': 'e2e@demo.local',
           'phone': '012-345 6789', 'int': '3', 'number': '12.5', 'date': '2026-12-01', 'time': '10:30'}
@@ -79,12 +82,12 @@ with sync_playwright() as p:
         pg.goto(B + '#/daftar'); pg.wait_for_selector('#f-fullName')
         pg.fill('#f-fullName', 'Ujian E2E'); pg.fill('#f-email', 'e2e@demo.local'); pg.fill('#f-password', 'lemah')
         pg.click('button[type=submit]'); pg.wait_for_selector('.field-error'); step('validasi kata laluan dipaparkan pada medan')
-        pg.fill('#f-password', 'Kuat12345'); pg.click('button[type=submit]'); pg.wait_for_selector('.welcome'); step('daftar → papan pemuka')
+        pg.fill('#f-password', 'Kuat12345'); pg.click('button[type=submit]'); pg.wait_for_selector(HOME); step('daftar → papan pemuka')
         BLOCK_Q = 'e2e'
     else:
         pg.goto(B + '#/daftar'); pg.wait_for_selector('.auth-card'); assert 'ditutup' in pg.inner_text('.auth-card'); step('pendaftaran ditutup dipaparkan')
         pg.goto(B + '#/log-masuk'); pg.wait_for_selector('#f-email'); pg.fill('#f-email', 'user@demo.local'); pg.fill('#f-password', 'Demo1234')
-        pg.click('button[type=submit]'); pg.wait_for_selector('.welcome'); step('log masuk pengguna demo → papan pemuka')
+        pg.click('button[type=submit]'); pg.wait_for_selector(HOME); step('log masuk pengguna demo → papan pemuka')
         BLOCK_Q = 'Siti'
 
     rec_url = None
@@ -112,7 +115,7 @@ with sync_playwright() as p:
 
     # ---- admin
     pg.evaluate('localStorage.clear();sessionStorage.clear()'); pg.goto(B); pg.reload(); pg.goto(B + '#/log-masuk'); pg.wait_for_selector('#f-email')
-    pg.fill('#f-email', 'super@demo.local'); pg.fill('#f-password', 'Demo1234'); pg.click('button[type=submit]'); pg.wait_for_selector('.stat')
+    pg.fill('#f-email', 'super@demo.local'); pg.fill('#f-password', 'Demo1234'); pg.click('button[type=submit]'); pg.wait_for_selector(ADMIN_HOME)
     step('admin log masuk → dashboard')
     if USER_MOD and USER_MOD['statuses'] and rec_url:
         rid = rec_url.split('/')[-1]
@@ -128,7 +131,7 @@ with sync_playwright() as p:
     # ---- semakan visual telefon (360px): tiada skrol mendatar
     m = b.new_page(viewport={'width': 360, 'height': 780}); m.route('https://fonts.**', lambda r: r.abort())
     m.goto(B + '#/log-masuk'); m.wait_for_selector('#f-email'); m.fill('#f-email', 'user@demo.local'); m.fill('#f-password', 'Demo1234'); m.click('button[type=submit]')
-    m.wait_for_selector('.welcome')
+    m.wait_for_selector(HOME)
     routes = ['/utama', '/notifikasi', '/profil'] + [x['path'] for x in MODS if x['nav'].get('user', True)]
     if USER_MOD: routes.append(USER_MOD['path'] + '/baru')
     for r in routes:

@@ -1,7 +1,7 @@
 /**
  * @file AppTests.gs
  * Ujian domain FKM Talent: skor, konfigurasi, gerbang pendaftaran, skop RBAC, cache, penyelarasan status,
- * Auto-Extract CV dan import sistem lama. Dijalankan oleh `npm test` dan `runTestsPart5`.
+ * User Access Control, Auto-Extract CV dan import sistem lama. Dijalankan oleh `npm test` dan `runTestsPart5`.
  */
 const AppTests = { suites: function () { return [TestSuiteFkm]; } };
 
@@ -102,6 +102,21 @@ const TestSuiteFkm = {
       t.eq(none.access.peranan, 'TIADA');
       t.eq(none.staff.length, 0);
       TestAssert.apiFail(api({ action: 'staf.data', payload: {} }), ERROR_CODES.UNAUTHENTICATED);
+    }],
+    ['User Access Control: senarai capaian + status akaun, admin sahaja', function (t) {
+      const adm = TestHelpers.admin(ROLES.ADMIN);
+      const ts = Date.now();
+      const reg = 'uac.daftar' + ts + '@utm.my', bel = 'uac.belum' + ts + '@utm.my';
+      FkmT.capaian(adm, reg, 'DEAN');
+      FkmT.capaian(adm, bel, 'HOD', 'tb');
+      const u = FkmT.user(reg);
+      const items = TestAssert.apiOk(TestHelpers.call(adm.token, 'staf.akses', {})).items;
+      const a = items.filter(function (x) { return x.email === reg; })[0];
+      const b = items.filter(function (x) { return x.email === bel; })[0];
+      t.ok(a && a.akaun && a.akaun.status === USER_STATUS.ACTIVE && a.peranan === 'DEAN', 'akaun berdaftar dipadankan ikut e-mel');
+      t.ok(b && b.akaun === null && b.skop === 'TB', 'belum daftar → akaun null; skop HOD huruf besar');
+      t.eq(JSON.stringify(items).indexOf('hash'), -1, 'tiada hash/rahsia dalam respons');
+      TestAssert.apiFail(TestHelpers.call(u.token, 'staf.akses', {}), ERROR_CODES.FORBIDDEN);
     }],
     ['Cache set data: dibatalkan serta-merta selepas rekod staf disunting', function (t) {
       const adm = TestHelpers.admin(ROLES.ADMIN);

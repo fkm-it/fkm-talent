@@ -9,16 +9,20 @@ Dashboard bakat & kesiapsiagaan kenaikan pangkat staf akademik **Fakulti Kejurut
 
 ## Ciri
 
-| Paparan | Siapa | Kandungan |
+Antara muka mengekalkan rupa sistem lama (sidebar, kad KPI, carta Chart.js, jadual):
+
+| Halaman | Siapa | Kandungan |
 |---|---|---|
-| Ringkasan Eksekutif | Admin, Dekan, Ketua Jabatan | KPI fakulti, status kesiapsiagaan, skor ikut jabatan, taburan gred, trend penerbitan, pematuhan latihan |
-| Direktori & Profil | ikut skop | Carian/penapis, profil penuh, cincin skor, pecahan 4 komponen, analisis jurang |
-| Kenaikan Pangkat | ikut skop | Senarai skor tertinggi, taburan HIJAU/KUNING/MERAH, purata komponen |
-| Analitik | ikut skop | Latihan, Penyelidikan, Geran, Penyeliaan, Khidmat & Perundingan, MyRA (indikatif) |
-| Penasihat Kerjaya | ikut skop | Analisis berasaskan peraturan daripada data profil |
-| Auto-Extract CV | Admin | PDF CV Akademik UTM dibaca **dalam pelayar** (pdf.js), simpan pukal ke rekod staf |
+| Executive Dashboard | Admin, Dekan, Ketua Jabatan | 7 KPI, taburan gred & jabatan, purata skor jabatan, pematuhan latihan, trend penerbitan |
+| Staff Profile | ikut skop (staf: profil sendiri) | Direktori + penapis, profil penuh dalam modal, analisis jurang |
+| Promotion Readiness | ikut skop | GREEN/YELLOW/RED, carta radar komponen, senarai skor |
+| Training / Research / Grant / Supervision / Khidmat & Perundingan | ikut skop | KPI, carta, rekod per staf |
+| MyRA Audit Score | Admin, Dekan, Ketua Jabatan | Anggaran indikatif |
+| Auto-Extract CV | Admin | PDF CV Akademik UTM dibaca **dalam pelayar** (pdf.js), simpan pukal |
+| AI Career Advisor | ikut skop | Analisis berasaskan peraturan daripada data profil |
+| User Access Control | Admin | Matriks RBAC, senarai capaian (peranan/skop/status), status akaun, pautan reset, audit log |
 | Import Sistem Lama | Super Admin | Salin STAFF_PROFILE + USER_ACCESS daripada Sheet lama (baca sahaja, idempoten) |
-| Staf Akademik / Capaian | Admin | CRUD penuh, status perkhidmatan, eksport CSV, audit |
+| Panel Pentadbir | Admin | Panel templat: Pengguna, CRUD Staf/Capaian, Tetapan, Audit, Kesihatan |
 
 **Peranan & skop data** (ditapis di pelayan):
 
@@ -51,7 +55,7 @@ npm test            # 76 ujian backend (2 susunan muat), termasuk suite domain F
 npm run check       # semakan frontend & imbasan rahsia
 npm run dev         # http://localhost:8080 — data demo REKAAN
 npm run e2e         # E2E generik templat
-npm run e2e:fkm     # E2E paparan FKM × 4 peranan, desktop + telefon 360px
+npm run e2e:fkm     # E2E 13 halaman FKM × 4 peranan, desktop + telefon 360px
                     # KD_CV_DIR=/folder/pdf npm run e2e:fkm → uji Auto-Extract dengan PDF sebenar (TEMPATAN sahaja)
 ```
 
@@ -67,9 +71,9 @@ src/domain/FkmAccess.gs     RBAC domain (DEAN/HOD/STAFF), gerbang pendaftaran, p
 src/domain/FkmData.gs       set data dashboard + cache termampat (gzip)
 src/domain/FkmImport.gs     import sistem lama & simpan CV (bulkUpsert)
 src/modules/staf/StafHooks.gs, capaian/CapaianHooks.gs   peraturan domain + laluan API staf.*
-src/frontend/modules/staf.html   semua paparan FKM + pengekstrak CV
+src/frontend/modules/staf.html   shell FKM (KD.shells.app) + semua halaman + pengekstrak CV
 src/tests/AppTests.gs       ujian domain
-pwa/vendor/pdfjs/           pdf.js 3.11.174 (dimuat malas, CSP 'self')
+pwa/vendor/pdfjs/, chartjs/  pdf.js 3.11.174 & Chart.js 4.4.1 (dimuat malas, CSP 'self')
 ```
 
 **Privasi:** tiada data staf sebenar dalam repo. Data hanya dalam Google Sheet pemilik; PDF CV tidak pernah dimuat naik ke pelayan.
