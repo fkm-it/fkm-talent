@@ -1,8 +1,8 @@
 {
-  "name": "gas-pwa-starter",
-  "version": "0.4.4",
+  "name": "fkm-talent",
+  "version": "0.1.0",
   "private": true,
-  "description": "Templat sistem web + PWA atas Google Apps Script, Sheets & Drive \u2014 modul dijana daripada JSON",
+  "description": "FKM Talent Intelligence — Pemantauan bakat dan kesiapsiagaan kenaikan pangkat akademik FKM",
   "engines": {
     "node": ">=18"
   },
@@ -15,6 +15,7 @@
     "check": "node tools/check-frontend.js && node tools/scan-secrets.js",
     "dev": "node tools/dev-server.js --seed",
     "e2e": "python3 tools/e2e.py",
+    "e2e:fkm": "python3 tools/e2e-fkm.py",
     "build:web": "node tools/build-web.js",
     "verify": "npm test && npm run check && npm run build:web -- --api http://localhost:8080/__api --out .verify-web",
     "push": "npm test && npm run check && node tools/build-gas.js && clasp push",

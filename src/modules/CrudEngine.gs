@@ -488,6 +488,97 @@ const CrudEngine = {
     return CrudEngine.toDTO(def, row, ctx && ctx.userId ? ctx : { role: ROLES.PUBLIC }, { attachments: saved });
   },
 
+  /**
+   * Upsert pukal (import / integrasi data luar): padan mengikut satu medan kunci, SATU tulisan berkelompok di bawah SATU kunci.
+   * Jauh lebih pantas daripada N× create/update (Sheets: 2 operasi tulis, bukan 2N).
+   *   items     [{ <fieldKey>: nilai, … }] — kunci camelCase seperti payload create/update
+   *   options   { keyField: 'staffId', owner: {userId, name}, onlyFilled: true (abaikan nilai kosong — jangan timpa data sedia ada),
+   *               extra: function (item) → { <lajur>: nilai } (lajur readonly/terbitan, cth. sumber data) }
+   * Setiap item disahkan seperti create/update (skema medan + hook validate + beforeSave); item tidak sah dilangkau dan dilaporkan.
+   * Hooks afterCreate/notifikasi TIDAK dipanggil (operasi pukal). Audit: satu entri ringkasan.
+   * @return {{added:number, updated:number, unchanged:number, errors:{index:number, key:string, message:string}[]}}
+   */
+  bulkUpsert: function (def, ctx, items, options) {
+    options = options || {};
+    const keyField = def.fields.filter(function (f) { return f.key === options.keyField; })[0];
+    if (!keyField) throw new Error('bulkUpsert: keyField tidak sah: ' + options.keyField);
+    const owner = options.owner || { userId: ctx && ctx.userId || '', name: ctx && ctx.user ? ctx.user.full_name : '' };
+    const h = CrudEngine.hooks(def);
+    const repo = CrudEngine.repo(def);
+    const out = { added: 0, updated: 0, unchanged: 0, errors: [] };
+    const norm = function (v) { return String(v === undefined || v === null ? '' : v).trim(); };
+
+    return Database.withLock(function () {
+      repo.invalidate();
+      const byKey = {};
+      repo.all().forEach(function (r) { if (r.state === RECORD_STATE.ACTIVE && norm(r[keyField.column])) byKey[norm(r[keyField.column])] = r; });
+      const inserts = [];
+      const patches = {};
+      const now = DateUtils.nowIso();
+      let refBase = null;
+      let refPrefix = '';
+      let refWidth = 4;
+
+      (items || []).forEach(function (raw, index) {
+        const key = norm(raw && raw[keyField.key]);
+        try {
+          if (!key) throw Errors.validation(keyField.label + ' diperlukan.');
+          const src = {};
+          Object.keys(raw).forEach(function (k) {
+            const v = raw[k];
+            if (options.onlyFilled && (v === undefined || v === null || (typeof v === 'string' && !v.trim()))) return;
+            src[k] = v;
+          });
+          const current = byKey[key] || null;
+          const mode = current ? 'update' : 'create';
+          const v = CrudEngine.validate(def, src, ctx, mode);
+          if (h.validate) h.validate(v.data, { ctx: ctx, mode: mode, current: current });
+          const extra = options.extra ? (options.extra(raw, current) || {}) : {};
+          Object.keys(extra).forEach(function (c) { v.row[c] = extra[c]; });
+          if (current) {
+            const patch = {};
+            Object.keys(v.row).forEach(function (c) { if (norm(current[c]) !== norm(v.row[c])) patch[c] = v.row[c]; });
+            if (h.beforeSave && Object.keys(patch).length) h.beforeSave(patch, { ctx: ctx, mode: 'update', current: current, bulk: true });
+            if (!Object.keys(patch).length) { out.unchanged++; return; }
+            patch.updated_at = now;
+            if (inserts.indexOf(current) >= 0) { Object.assign(current, patch); out.updated++; return; } // berganda dalam kelompok sama
+            patches[current.id] = Object.assign(patches[current.id] || {}, patch);
+            out.updated++;
+            return;
+          }
+          const id = IdUtils.generate(def.prefix);
+          const row = Object.assign({}, v.row, {
+            id: id, ref_no: '', owner_user_id: owner.userId || '', owner_name: owner.name || '',
+            status: def.defaultStatus || '', status_note: '', status_changed_at: '', status_changed_by: '',
+            state: RECORD_STATE.ACTIVE, created_at: now, updated_at: now, deleted_at: ''
+          }, extra.status ? { status: extra.status } : {});
+          def.fields.forEach(function (f) { if (row[f.column] === undefined) row[f.column] = f.type === 'bool' ? false : (f.type === 'files' ? 0 : ''); });
+          if (h.beforeSave) h.beforeSave(row, { ctx: ctx, mode: 'create', current: null, bulk: true });
+          if (refBase === null) {
+            const first = CrudEngine.nextRefNo(def, id);
+            const m = String(first).match(/^(.*?)(\d+)$/);
+            if (m) { refPrefix = m[1]; refBase = Number(m[2]); refWidth = m[2].length; } else refBase = -1;
+            row.ref_no = first;
+          } else row.ref_no = refBase < 0 ? id : refPrefix + String(++refBase).padStart(refWidth, '0');
+          inserts.push(row);
+          byKey[key] = row; // item berganda dalam satu kelompok → kemas kini, bukan baris kedua
+          out.added++;
+        } catch (e) {
+          out.errors.push({ index: index, key: key, message: e && e.message ? e.message : String(e) });
+        }
+      });
+
+      if (inserts.length) repo.insertMany(inserts);
+      if (Object.keys(patches).length) repo.updateMany(patches);
+      if (out.added || out.updated) {
+        AppCache.remove('stats:admin');
+        AuditService.log(ctx && ctx.userId ? ctx : { role: ROLES.PUBLIC }, AUDIT_ACTIONS.RECORD_UPDATED, def.sheet, '',
+          'Pukal: ' + out.added + ' baharu, ' + out.updated + ' dikemas kini' + (out.errors.length ? ', ' + out.errors.length + ' ralat' : ''));
+      }
+      return out;
+    });
+  },
+
   update: function (ctx, payload) {
     const def = CrudEngine.get(payload && payload.module);
     const current = CrudEngine.requireViewable(def, payload && payload.id, ctx);

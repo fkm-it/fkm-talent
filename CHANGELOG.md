@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## FKM Talent 0.1.0 — 2026-10-21
+Versi pertama sistem baharu (berasingan daripada sistem Apps Script lama).
+- Modul `staf` (85 medan profil + KPI, status perkhidmatan) dan `capaian` (senarai putih pendaftaran, peranan DEAN/HOD/STAFF + skop).
+- Paparan: Ringkasan Eksekutif, Direktori, Profil + analisis jurang, Kenaikan Pangkat, Analitik (6 tab), Penasihat Kerjaya, Auto-Extract CV, Import Sistem Lama.
+- Prestasi: set data + skor dikira sekali, dicache termampat (gzip, dipecah) dan dibatalkan automatik; satu panggilan API per halaman; carta SVG tanpa pustaka; pdf.js dimuat malas.
+- Pembetulan berbanding sistem lama: ambang jalur konsisten, satu enjin skor, jam latihan tiada dikira 0, kiraan pengerusi/penceramah CV (tarikh `22/10 /2025`), pdf.js `isEvalSupported:false`.
+- Teras templat (generik): `CrudEngine.bulkUpsert`, `AppHooks.beforeRegister`, pengesah tetapan `def.validate`, salinan `pwa/vendor/` dalam binaan web, mock GAS (`gzip/ungzip`, `putAll/getAll`, `getDataRange`).
+- Ujian: 8 ujian domain (76 jumlah) + E2E `e2e-fkm.py` (4 peranan × desktop/360px).
+
+---
+Sejarah templat `gas-pwa-starter`:
+
 ## 0.4.4 — 2026-10-13
 - **Dibaiki:** medan `int` pilihan yang kosong dipulangkan sebagai 0 (repository + DTO), jadi borang sunting menghantar 0 dan gagal validasi `min` (cth. tahun perolehan `min: 1990`). Medan modul `int` kini guna jenis lajur `intOrNull` (sel kosong kekal kosong, DTO `null`); kiraan `files` kekal 0. Ditemui semasa membina Dashboard Unit IT FKM. Sistem sedia ada: tarik `tools/gen.js`, `RepositoryBase.gs`, `CrudEngine.gs`, kemudian `npm run gen`.
 - Ujian kategori teras tidak lagi menganggap hanya kategori `Umum` wujud (`TestHelpers.singleCategory`), jadi projek yang mengubah `SeedData.CATEGORIES` tidak gagal ujian teras.

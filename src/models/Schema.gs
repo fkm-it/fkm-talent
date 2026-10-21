@@ -76,15 +76,15 @@ const SCHEMA = Object.freeze({
   // ===================================================================== MODUL
   // Blok di bawah DIJANA oleh `npm run gen` daripada modules/*.json — jangan sunting dengan tangan.
   // @generator:schema:start
-  ADUAN: {
-    sheet: 'ADUAN', id: 'id', prefix: 'AD', module: 'aduan',
-    columns: ['id', 'ref_no', 'owner_user_id', 'owner_name', 'nama', 'email', 'tajuk', 'kategori', 'keutamaan', 'lokasi', 'keterangan', 'lampiran', 'catatan_pentadbir', 'status', 'status_note', 'status_changed_at', 'status_changed_by', 'state', 'created_at', 'updated_at', 'deleted_at'],
-    types: {'lampiran': 'int'}
+  STAF: {
+    sheet: 'STAF', id: 'id', prefix: 'SF', module: 'staf',
+    columns: ['id', 'ref_no', 'owner_user_id', 'owner_name', 'staff_id', 'gelaran', 'nama', 'email', 'telefon', 'jabatan', 'jawatan', 'gred', 'jawatan_pentadbiran', 'sasaran', 'kelayakan', 'bidang_kepakaran', 'niche_area', 'research_alliance', 'rg_nama', 'rg_kod', 'rg_peranan', 'institut', 'peran_coe', 'rg_baharu', 'status_perkhidmatan', 'warganegara', 'negara', 'lantikan_pertama', 'lantikan_semasa', 'tamat_perkhidmatan', 'tarikh_lahir', 'umur', 'kohort', 'tempoh_khidmat', 'scopus_id', 'pub', 'q0', 'q1', 'q2', 'q3', 'q4', 'scopus_count', 'wos', 'sitasi', 'h_index', 'pub2020', 'pub2021', 'pub2022', 'pub2023', 'pub2024', 'pub2025', 'geran', 'geran_aktif', 'geran_pi', 'dana', 'phd_selia', 'phd_tamat', 'sarjana_selia', 'sarjana_tamat', 'jam_ajar_ug', 'jam_ajar_pg', 'jam_latihan', 'latihan_wajib', 'latihan_pdp', 'latihan_penyelidikan', 'latihan_ai', 'latihan_digital', 'latihan_kepimpinan', 'latihan_profesional', 'projek_perundingan', 'nilai_perundingan', 'viva_dalaman', 'viva_luar', 'penilai_geran', 'pewasit_jurnal', 'jk_antarabangsa', 'jk_kebangsaan', 'jk_universiti', 'jk_fakulti', 'pengerusi_sesi', 'anugerah_antarabangsa', 'anugerah_kebangsaan', 'anugerah_utm', 'hak_cipta', 'lppt2025', 'lppt2024', 'lppt2023', 'sumber_data', 'cv_dikemaskini', 'status', 'status_note', 'status_changed_at', 'status_changed_by', 'state', 'created_at', 'updated_at', 'deleted_at'],
+    types: {'umur': 'intOrNull', 'tempoh_khidmat': 'intOrNull', 'pub': 'intOrNull', 'q0': 'intOrNull', 'q1': 'intOrNull', 'q2': 'intOrNull', 'q3': 'intOrNull', 'q4': 'intOrNull', 'scopus_count': 'intOrNull', 'wos': 'intOrNull', 'sitasi': 'intOrNull', 'h_index': 'intOrNull', 'pub2020': 'intOrNull', 'pub2021': 'intOrNull', 'pub2022': 'intOrNull', 'pub2023': 'intOrNull', 'pub2024': 'intOrNull', 'pub2025': 'intOrNull', 'geran': 'intOrNull', 'geran_aktif': 'intOrNull', 'geran_pi': 'intOrNull', 'phd_selia': 'intOrNull', 'phd_tamat': 'intOrNull', 'sarjana_selia': 'intOrNull', 'sarjana_tamat': 'intOrNull', 'jam_ajar_ug': 'intOrNull', 'jam_ajar_pg': 'intOrNull', 'latihan_wajib': 'bool', 'projek_perundingan': 'intOrNull', 'viva_dalaman': 'intOrNull', 'viva_luar': 'intOrNull', 'penilai_geran': 'intOrNull', 'pewasit_jurnal': 'intOrNull', 'jk_antarabangsa': 'intOrNull', 'jk_kebangsaan': 'intOrNull', 'jk_universiti': 'intOrNull', 'jk_fakulti': 'intOrNull', 'pengerusi_sesi': 'intOrNull', 'anugerah_antarabangsa': 'intOrNull', 'anugerah_kebangsaan': 'intOrNull', 'anugerah_utm': 'intOrNull', 'hak_cipta': 'intOrNull'}
   },
-  PENGUMUMAN: {
-    sheet: 'PENGUMUMAN', id: 'id', prefix: 'PE', module: 'pengumuman',
-    columns: ['id', 'ref_no', 'owner_user_id', 'owner_name', 'tajuk', 'isi', 'tarikh_tamat', 'penting', 'status', 'status_note', 'status_changed_at', 'status_changed_by', 'state', 'created_at', 'updated_at', 'deleted_at'],
-    types: {'penting': 'bool'}
+  CAPAIAN: {
+    sheet: 'CAPAIAN', id: 'id', prefix: 'CP', module: 'capaian',
+    columns: ['id', 'ref_no', 'owner_user_id', 'owner_name', 'email', 'nama', 'peranan', 'skop', 'catatan', 'status', 'status_note', 'status_changed_at', 'status_changed_by', 'state', 'created_at', 'updated_at', 'deleted_at'],
+    types: {}
   },
   // @generator:schema:end
 });

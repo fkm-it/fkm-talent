@@ -97,6 +97,14 @@ const server = http.createServer((req, res) => {
     res.end(fs.readFileSync(file));
     return;
   }
+  if (url.pathname.startsWith('/vendor/')) { /* pustaka dimuat malas (pwa/vendor) */
+    const VD = path.join(__dirname, '..', 'pwa', 'vendor');
+    const file = path.resolve(VD, decodeURIComponent(url.pathname.slice(8)));
+    if (!file.startsWith(VD + path.sep) || !fs.existsSync(file)) { res.writeHead(404); res.end('Not found'); return; }
+    res.writeHead(200, { 'Content-Type': 'text/javascript; charset=utf-8' });
+    res.end(fs.readFileSync(file));
+    return;
+  }
   if (url.pathname === '/' || url.pathname === '/index.html') {
     const app = tpl.readAppConfig();
     let page = renderTemplate('frontend/index', { appName: app.appName, tagline: app.tagline, version: app.version, slug: app.slug });

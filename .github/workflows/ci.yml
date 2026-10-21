@@ -53,6 +53,10 @@ jobs:
           node tools/dev-server.js --seed --port 8080 > dev-server.log 2>&1 &
           for i in $(seq 1 30); do curl -sf http://localhost:8080/ > /dev/null && break; sleep 1; done
           python tools/e2e.py
+          # E2E paparan FKM pada pelayan BAHARU (e2e.py menyekat akaun demo user@ semasa ujian admin)
+          node tools/dev-server.js --seed --port 8081 > dev-server-fkm.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:8081/ > /dev/null && break; sleep 1; done
+          KD_BASE=http://localhost:8081/ python tools/e2e-fkm.py
       - name: Simpan tangkapan skrin telefon
         if: always()
         uses: actions/upload-artifact@v4
@@ -61,4 +65,5 @@ jobs:
           path: |
             e2e-shots
             dev-server.log
+            dev-server-fkm.log
           retention-days: 7

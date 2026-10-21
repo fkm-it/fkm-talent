@@ -146,6 +146,9 @@ fs.copyFileSync(path.join(PWA, 'offline.html'), path.join(OUT, 'offline.html'));
 const icons = fs.readdirSync(path.join(PWA, 'icons'));
 icons.forEach((f) => fs.copyFileSync(path.join(PWA, 'icons', f), path.join(OUT, 'icons', f)));
 fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
+// Pustaka pihak ketiga yang dimuat secara malas (cth. pdf.js) — disalin apa adanya (CSP script-src 'self')
+const vendorDir = path.join(PWA, 'vendor');
+if (fs.existsSync(vendorDir)) fs.cpSync(vendorDir, path.join(OUT, 'vendor'), { recursive: true });
 // Tangkapan skrin untuk dialog pasang Android (tidak dicache oleh service worker)
 const shotsDir = path.join(PWA, 'screenshots');
 if (fs.existsSync(shotsDir)) {

@@ -1,84 +1,75 @@
-# GAS PWA Starter
+# FKM Talent Intelligence
 
-Templat untuk membina **sistem lengkap**: laman web, app telefon (PWA) dan panel pentadbir, di atas **Google Apps Script + Sheets + Drive**. Modul ditakrif dalam fail JSON, dan deploy berjalan automatik melalui GitHub Actions.
+Dashboard bakat & kesiapsiagaan kenaikan pangkat staf akademik **Fakulti Kejuruteraan Mekanikal, UTM** — versi baharu yang menggantikan *FKM Academic Talent & Career Intelligence Dashboard* (Apps Script salin-tampal).
 
-Teras templat ini diekstrak daripada sistem produksi *Kirim Doa*: auth, RBAC, migrasi, push FCM, PWA dan binaan GitHub Pages telah teruji di lapangan.
+- **Web + app telefon (PWA):** GitHub Pages — `https://fkm-it.github.io/fkm-talent/`
+- **Backend:** Google Apps Script + Google Sheets (projek & Sheet **baharu**, berasingan daripada sistem lama)
+- **Deploy:** `git push main` → GitHub Actions (ujian → `clasp push` → kemas kini deployment → GitHub Pages). Tiada salin-tampal ke editor.
+- Dibina atas templat [`kirimdoa/gas-pwa-starter`](docs/TEMPLAT.md).
 
-```
-modules/aduan.json  ──npm run gen──▶  backend (Sheets, API, RBAC, aliran status, notifikasi)
-                                      frontend (senarai, butiran, borang, borang awam, menu, dashboard)
-git push main       ──GitHub Actions─▶ ujian → Apps Script (clasp) → GitHub Pages (web + PWA)
-```
+## Ciri
 
-## Apa yang anda dapat tanpa menulis kod
+| Paparan | Siapa | Kandungan |
+|---|---|---|
+| Ringkasan Eksekutif | Admin, Dekan, Ketua Jabatan | KPI fakulti, status kesiapsiagaan, skor ikut jabatan, taburan gred, trend penerbitan, pematuhan latihan |
+| Direktori & Profil | ikut skop | Carian/penapis, profil penuh, cincin skor, pecahan 4 komponen, analisis jurang |
+| Kenaikan Pangkat | ikut skop | Senarai skor tertinggi, taburan HIJAU/KUNING/MERAH, purata komponen |
+| Analitik | ikut skop | Latihan, Penyelidikan, Geran, Penyeliaan, Khidmat & Perundingan, MyRA (indikatif) |
+| Penasihat Kerjaya | ikut skop | Analisis berasaskan peraturan daripada data profil |
+| Auto-Extract CV | Admin | PDF CV Akademik UTM dibaca **dalam pelayar** (pdf.js), simpan pukal ke rekod staf |
+| Import Sistem Lama | Super Admin | Salin STAFF_PROFILE + USER_ACCESS daripada Sheet lama (baca sahaja, idempoten) |
+| Staf Akademik / Capaian | Admin | CRUD penuh, status perkhidmatan, eksport CSV, audit |
 
-| Bahagian | Butiran |
+**Peranan & skop data** (ditapis di pelayan):
+
+| Peranan | Data |
 |---|---|
-| Akaun | Daftar, log masuk, lupa kata laluan (kod email), profil, tukar kata laluan, kunci akaun, sesi boleh dibatalkan |
-| Peranan | USER / ADMIN / SUPER_ADMIN, dikuatkuasa di pelayan |
-| Modul (JSON) | Senarai + carian + penapis + cip status + pagination, butiran, borang cipta/sunting, eksport CSV, lampiran Drive, no. rujukan `ADU-2026-0001`, padam lembut + pulih |
-| Aliran kerja | Status dengan warna, catatan status, siapa boleh tukar, pemilik dikunci selepas diproses |
-| Borang awam | Tanpa log masuk, anti-bot (token HMAC + honeypot + had kadar), email status kepada pemohon |
-| Notifikasi | Dalam app, telefon (FCM, dengan lencana pada ikon app) dan email (pilihan) |
-| Pentadbir | Dashboard per modul, pengguna, kategori, hebahan, maklum balas, audit log, tetapan runtime, kesihatan sistem, sandaran harian |
-| App telefon | PWA boleh dipasang (Android/iPhone), pintasan modul, halaman luar talian, ikon dijana mengikut warna jenama |
-| Kualiti | 65 ujian backend (2 susunan muat), E2E pelayar generik + semakan telefon 360px, imbasan rahsia |
+| ADMIN / SUPER_ADMIN (menu Pengguna) | Semua + tindakan tulis |
+| Capaian `DEAN` | Semua jabatan, baca sahaja |
+| Capaian `HOD` + skop `KBPI` | Jabatan KBPI sahaja |
+| Capaian `STAFF` + skop Staff ID | Profil sendiri sahaja |
+| Tiada capaian | Tiada data |
 
-## Mula pantas
+Hanya e-mel dalam senarai **Capaian** (domain UTM) boleh mendaftar. Nyahaktif staf (Bersara/Tamat kontrak…) → capaian & akaun log masuk dinyahaktif dan sesi ditamatkan serta-merta.
+
+**Skor:** formula UTM 4 komponen (45/30/15/10) + minimum komponen + gatekeeper LPPT ≥85% — sama seperti sistem lama, satu enjin di pelayan (`src/domain/FkmScoring.gs`). Benchmark boleh diubah di **Panel → Tetapan → FKM_SKOR** tanpa deploy.
+
+## Persediaan sekali sahaja
+
+Rujuk [DEPLOYMENT.md](DEPLOYMENT.md) §1 (clasp login, projek Apps Script, deployment Web App, GitHub Secrets/Variables). Khusus FKM:
+
+1. Script Properties: `BOOTSTRAP_SUPER_ADMIN_EMAIL` = e-mel anda, `LEGACY_SHEET_ID` = ID Google Sheet sistem lama, `APP_ENV` = `PRODUCTION`.
+2. Daftar di laman web dengan e-mel bootstrap → anda Super Admin.
+3. Panel → **Import Sistem Lama** → *Mula import* (atau jalankan `fkmImportLegacy` dalam editor).
+4. Panel → Capaian: semak senarai; staf mendaftar sendiri dengan e-mel yang disenaraikan. Naikkan admin di menu **Pengguna**.
+5. (Disyorkan) Panel → Auto-Extract CV untuk semua staf — data lama ada nilai LPPT/Q1/Q2 yang tidak sepadan dengan CV (lihat [audit](docs/AUDIT_SISTEM_LAMA.md)).
+
+## Pembangunan
 
 ```bash
-# 1. Cipta repo daripada templat ini (GitHub → "Use this template"), kemudian:
-npm run init -- --name "Sistem Tempahan Dewan" --short "Tempahan" --tagline "Tempah dewan dengan mudah" --color "#0F766E"
-
-# 2. Takrif modul (atau sunting modules/aduan.json sedia ada)
-npm run new -- tempahan "Tempahan"     # cipta modules/tempahan.json
-npm run gen                            # jana kod daripada JSON
-
-# 3. Uji & lihat
-npm test                               # ujian backend
-npm run dev                            # http://localhost:8080  (super@demo.local / Demo1234)
-npm run e2e                            # E2E pelayar (dev server mesti berjalan)
-
-# 4. Deploy: sediakan SEKALI (DEPLOYMENT.md), kemudian setiap `git push` ke main dideploy automatik.
+npm test            # 76 ujian backend (2 susunan muat), termasuk suite domain FKM
+npm run check       # semakan frontend & imbasan rahsia
+npm run dev         # http://localhost:8080 — data demo REKAAN
+npm run e2e         # E2E generik templat
+npm run e2e:fkm     # E2E paparan FKM × 4 peranan, desktop + telefon 360px
+                    # KD_CV_DIR=/folder/pdf npm run e2e:fkm → uji Auto-Extract dengan PDF sebenar (TEMPATAN sahaja)
 ```
 
-## Arahan
+Akaun demo (kata laluan `Demo1234`): `super@demo.local` (Super Admin), `user1@demo.local` (Dekan), `user0@demo.local` (Ketua Jabatan KBPI), `user@demo.local` (Staf).
 
-| Arahan | Fungsi |
-|---|---|
-| `npm run init -- --name … --color …` | Jenamakan sistem (nama, slogan, warna, ikon PWA) |
-| `npm run new -- <key> "<Label>"` | Cipta templat JSON modul baharu |
-| `npm run gen` | Jana modul daripada `modules/*.json` (`--check` dalam CI) |
-| `npm test` | Semak modul terkini + ujian backend (susunan muat abjad & terbalik) |
-| `npm run check` | Sintaks frontend, kebocoran API server, risiko XSS, imbasan rahsia |
-| `npm run dev` | Dev server dengan backend sebenar atas mock Google + data demo |
-| `npm run e2e` | Ujian E2E Playwright generik (membaca modul anda) |
-| `npm run build:web` | Binaan GitHub Pages (`web/`) |
-| `npm run push` | Ujian, kemudian `clasp push` (manual, tanpa CI) |
-
-## Dokumentasi
-
-- [CLAUDE.md](CLAUDE.md): aliran kerja untuk Claude (dan manusia) apabila membina sistem baharu daripada penerangan atau mockup
-- [docs/MODULES.md](docs/MODULES.md): rujukan penuh JSON modul, hooks dan contoh (tempahan, pinjaman, pendaftaran)
-- [DEPLOYMENT.md](DEPLOYMENT.md): persediaan sekali sahaja, CI/CD, Firebase, penyelesaian masalah
-- [SECURITY.md](SECURITY.md): model ancaman, kawalan, senarai semak operasi
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): seni bina, aliran data, had GAS
-
-## Struktur
+## Struktur khusus FKM
 
 ```
-modules/            ← takrifan modul (JSON) — SATU-SATUNYA tempat untuk menambah/ubah modul
-src/
-  Code.gs           doGet / doPost / api + fungsi operasi pemilik (setupDatabase, installTriggers, …)
-  config/           Config (nama, versi, had), Constants, Environment (Script Properties), DeployInfo (CI)
-  controllers/      Router (RBAC, satu pintu API) + pengawal nipis
-  modules/          CrudEngine (enjin generik) + <key>/<Name>Module.gs (dijana) + <Name>Hooks.gs (logik anda)
-  services/         Auth, User, Notification, Push (FCM), Settings, Security, Drive, Dashboard, System
-  repositories/     Akses Sheets (kunci, cache permintaan, auto-tambah lajur)
-  database/         Schema → SheetManager, Migration (+ autoRun selepas deploy), SeedData
-  frontend/         SPA vanilla JS: css/ (tokens jenama), js/ (app, api, ui, crud, pwa), views/
-  tests/            Ujian (berjalan dalam Node DAN Apps Script)
-pwa/                bridge.js, sw.js, manifest, ikon, offline.html, config.js (nilai awam)
-tools/              gen, init, build-web, dev-server, run-tests, e2e, scan-secrets, check-frontend
-.github/workflows/  ci.yml (ujian + E2E) · deploy.yml (Apps Script + GitHub Pages)
+modules/staf.json, modules/capaian.json   definisi modul (85 + 5 medan) → npm run gen
+src/domain/FkmConfig.gs     konfigurasi skor (lalai + tetapan FKM_SKOR)
+src/domain/FkmScoring.gs    enjin skor & analisis jurang
+src/domain/FkmAccess.gs     RBAC domain (DEAN/HOD/STAFF), gerbang pendaftaran, penyelarasan akaun
+src/domain/FkmData.gs       set data dashboard + cache termampat (gzip)
+src/domain/FkmImport.gs     import sistem lama & simpan CV (bulkUpsert)
+src/modules/staf/StafHooks.gs, capaian/CapaianHooks.gs   peraturan domain + laluan API staf.*
+src/frontend/modules/staf.html   semua paparan FKM + pengekstrak CV
+src/tests/AppTests.gs       ujian domain
+pwa/vendor/pdfjs/           pdf.js 3.11.174 (dimuat malas, CSP 'self')
 ```
+
+**Privasi:** tiada data staf sebenar dalam repo. Data hanya dalam Google Sheet pemilik; PDF CV tidak pernah dimuat naik ke pelayan.

@@ -80,6 +80,7 @@ const SettingsService = {
       try {
         const v = Validator.coerce(changes[k], SettingModel.rule(k, def), k);
         if (k === 'ADMIN_EMAIL' && v && !Validator.EMAIL_RE.test(v)) throw new Error('Email tidak sah.');
+        if (typeof def.validate === 'function') def.validate(v); // pengesah khusus tetapan (cth. JSON konfigurasi domain)
         values[k] = SettingModel.serialize(def, v);
       } catch (e) {
         errors[k] = e.message;

@@ -7,15 +7,15 @@
  * Tetapan yang boleh diubah admin semasa runtime ada dalam SETTINGS_DEFS (models/SettingModel.gs).
  */
 const CONFIG = Object.freeze({
-  APP_NAME: 'Sistem Saya', // @init:appName
-  TAGLINE: 'Urus kerja dengan mudah', // @init:tagline
+  APP_NAME: 'FKM Talent Intelligence', // @init:appName
+  TAGLINE: 'Pemantauan bakat dan kesiapsiagaan kenaikan pangkat akademik FKM', // @init:tagline
   /** Nama pendek di bawah ikon app telefon (≤ 12 aksara). */
-  SHORT_NAME: 'Sistem Saya', // @init:shortName
+  SHORT_NAME: 'FKM Talent', // @init:shortName
   /** Awalan nama fail Drive (sandaran, ujian). Huruf/nombor sahaja. */
-  APP_SLUG: 'SistemSaya', // @init:slug
+  APP_SLUG: 'FkmTalent', // @init:slug
   /** Warna jenama (email, dsb.). */
-  BRAND_COLOR: '#4F46E5', // @init:brandColor
-  VERSION: '0.4.4',
+  BRAND_COLOR: '#1E5FD8', // @init:brandColor
+  VERSION: '0.1.0',
   TIMEZONE_FALLBACK: 'Asia/Kuala_Lumpur',
 
   DEFAULT_PAGE_SIZE: 20,

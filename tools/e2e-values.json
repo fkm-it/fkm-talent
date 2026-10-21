@@ -1,0 +1,4 @@
+{
+  "staf": { "staffId": "77001", "umur": "40", "kohort": "B", "tempohKhidmat": "10", "lppt2025": "90", "lppt2024": "88", "lppt2023": "91", "jabatan": "KBPI", "email": "e2e.staf@demo.local" },
+  "capaian": { "email": "e2e.capaian@demo.local", "peranan": "DEAN", "skop": "" }
+}

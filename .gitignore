@@ -10,3 +10,5 @@ web/
 e2e-shots/
 *firebase-adminsdk*.json
 build/
+*.pdf
+!pwa/vendor/**

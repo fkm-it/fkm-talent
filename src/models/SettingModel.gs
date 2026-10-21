@@ -5,8 +5,8 @@
  * `public: true` → didedahkan kepada frontend (tiada rahsia di sini).
  */
 const SETTINGS_DEFS = Object.freeze({
-  SYSTEM_NAME: { type: 'string', max: 60, minRole: 'ADMIN', public: true, description: 'Nama sistem', default: 'Sistem Saya' }, // @init:appName
-  SYSTEM_TAGLINE: { type: 'string', max: 120, minRole: 'ADMIN', public: true, description: 'Slogan', default: 'Urus kerja dengan mudah' }, // @init:tagline
+  SYSTEM_NAME: { type: 'string', max: 60, minRole: 'ADMIN', public: true, description: 'Nama sistem', default: 'FKM Talent Intelligence' }, // @init:appName
+  SYSTEM_TAGLINE: { type: 'string', max: 120, minRole: 'ADMIN', public: true, description: 'Slogan', default: 'Pemantauan bakat dan kesiapsiagaan kenaikan pangkat akademik FKM' }, // @init:tagline
   LANDING_MESSAGE: { type: 'text', default: 'Log masuk atau daftar untuk mula menggunakan sistem.', max: 400, minRole: 'ADMIN', public: true, description: 'Mesej halaman utama' },
   ORG_NAME: { type: 'string', default: '', max: 120, minRole: 'ADMIN', public: true, description: 'Nama organisasi (footer)' },
   ALLOW_REGISTRATION: { type: 'bool', default: true, minRole: 'SUPER_ADMIN', public: true, description: 'Benarkan pendaftaran baharu' },
@@ -19,7 +19,17 @@ const SETTINGS_DEFS = Object.freeze({
   },
   DEFAULT_PAGE_SIZE: { type: 'int', default: 20, min: 5, max: 100, minRole: 'ADMIN', public: true, description: 'Saiz halaman senarai' },
   NOTIFY_EMAIL_ENABLED: { type: 'bool', default: false, minRole: 'ADMIN', public: false, description: 'Hantar email untuk notifikasi rekod (rekod baharu kepada admin, perubahan status kepada pemilik)' },
-  ADMIN_EMAIL: { type: 'string', default: '', max: 254, minRole: 'SUPER_ADMIN', public: false, description: 'Email pentadbir untuk maklum balas & amaran' }
+  ADMIN_EMAIL: { type: 'string', default: '', max: 254, minRole: 'SUPER_ADMIN', public: false, description: 'Email pentadbir untuk maklum balas & amaran' },
+  // ---- FKM Talent (domain)
+  FKM_EMAIL_DOMAINS: {
+    type: 'string', default: 'utm.my,mail.fkm.utm.my,graduate.utm.my,live.utm.my', max: 300, minRole: 'SUPER_ADMIN', public: false,
+    description: 'Domain e-mel yang dibenarkan dalam senarai Capaian (dipisah koma)'
+  },
+  FKM_SKOR: {
+    type: 'text', default: '', max: 6000, minRole: 'ADMIN', public: false,
+    description: 'Konfigurasi skor kenaikan pangkat (JSON): bobot, minimum komponen, ambang LPPT, jalur warna dan keperluan setiap gred sasaran. Kosong = nilai lalai (ANGGARAN). Tetapkan "rasmi": true selepas disahkan dengan pekeliling UTM.',
+    validate: function (v) { if (String(v || '').trim()) FkmConfig.parse(String(v), true); }
+  }
 });
 
 const SettingModel = {

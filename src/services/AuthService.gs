@@ -73,6 +73,10 @@ const AuthService = {
     }
     Validator.password(data.password, data.email);
     SecurityService.rateLimit('auth.register.global', 'all');
+    // Titik sambungan projek: sekat/benarkan pendaftaran (cth. senarai putih e-mel). Tiada AppHooks = templat asal.
+    if (typeof AppHooks !== 'undefined' && AppHooks.beforeRegister) {
+      AppHooks.beforeRegister(data, { isBootstrap: !!(boot && boot === data.email && UserRepository.countByRole(ROLES.SUPER_ADMIN) === 0), ctx: ctx });
+    }
     SecurityService.rateLimit('auth.register', data.email);
 
     // Hash di LUAR kunci (operasi berat), semak keunikan DI DALAM kunci.

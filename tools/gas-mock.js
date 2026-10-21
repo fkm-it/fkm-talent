@@ -82,6 +82,7 @@ class MockSheet {
     this.data.forEach((line) => { (line || []).forEach((v, i) => { if (v !== '' && v !== undefined) max = Math.max(max, i + 1); }); });
     return max;
   }
+  getDataRange() { return this.getRange(1, 1, Math.max(1, this.getLastRow()), Math.max(1, this.getLastColumn())); }
   getMaxRows() { return this.maxRows; }
   getMaxColumns() { return this.maxCols; }
   insertRowsAfter(after, n) { this.maxRows += n; return this; }
@@ -229,7 +230,10 @@ function createGasEnvironment(options = {}) {
         if (String(v).length > 100 * 1024) throw new Error('Argument too large');
         state.cache.set(k, { v: String(v), exp: now() + Math.min(ttl, 21600) * 1000 });
       },
-      remove(k) { state.cache.delete(k); }
+      remove(k) { state.cache.delete(k); },
+      putAll(map, ttl = 600) { Object.keys(map).forEach((k) => this.put(k, map[k], ttl)); },
+      getAll(keys) { const o = {}; keys.forEach((k) => { const v = this.get(k); if (v !== null) o[k] = v; }); return o; },
+      removeAll(keys) { keys.forEach((k) => state.cache.delete(k)); }
     })
   };
 
@@ -264,6 +268,8 @@ function createGasEnvironment(options = {}) {
     base64EncodeWebSafe: (v) => asBuffer(v).toString('base64').replace(/\+/g, '-').replace(/\//g, '_'),
     base64Decode: (s) => toSigned(Buffer.from(String(s), 'base64')),
     newBlob: (data, mime, name) => new MockBlob(typeof data === 'string' ? toSigned(Buffer.from(data, 'utf8')) : data.slice(), mime, name),
+    gzip: (blob) => new MockBlob(toSigned(require('zlib').gzipSync(toBuffer(blob.getBytes()))), 'application/x-gzip', (blob.getName() || 'archive') + '.gz'),
+    ungzip: (blob) => new MockBlob(toSigned(require('zlib').gunzipSync(toBuffer(blob.getBytes()))), 'application/octet-stream', ''),
     formatDate: tzFormat,
     sleep: () => {}
   };
