@@ -55,6 +55,16 @@ const StafHooks = {
       }
     },
 
+    /** Semakan integriti: Sheet sistem lama vs pangkalan data baharu vs set data dashboard (baca sahaja). */
+    'staf.semak': {
+      role: 'ADMIN',
+      fn: function (payload, ctx) {
+        SecurityService.rateLimit('staf.cvSave', ctx.userId);
+        const id = String((payload && payload.sheetId) || Env.get('LEGACY_SHEET_ID') || '').trim();
+        return FkmImport.reconcile(id);
+      }
+    },
+
     /** Import baca-sahaja daripada Sheet sistem lama (Super Admin). */
     'staf.importLegacy': {
       role: 'SUPER_ADMIN',

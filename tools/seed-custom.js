@@ -3,7 +3,7 @@
  * Akaun: super@demo.local (SUPER_ADMIN), user@demo.local (STAFF — profil sendiri), user0@demo.local (HOD KBPI), user1@demo.local (DEAN).
  */
 'use strict';
-module.exports = function ({ api, ok, sup }) {
+module.exports = function ({ api, ok, sup, ctx }) {
   const call = (action, payload) => ok(api({ action, token: sup.token, payload }));
   call('admin.settings.update', { changes: { FKM_EMAIL_DOMAINS: 'utm.my,mail.fkm.utm.my,demo.local' } });
 
@@ -14,6 +14,7 @@ module.exports = function ({ api, ok, sup }) {
   const FIRST = ['Ahmad', 'Siti', 'Lim', 'Nurul', 'Kumar', 'Farah', 'Hafiz', 'Aina', 'Tan', 'Zul', 'Mei Ling', 'Rashid'];
   const LAST = ['Rahman', 'Ismail', 'Wei Jie', 'Hassan', 'Raj', 'Yusof', 'Omar', 'Karim', 'Chong', 'Abdullah', 'Ng', 'Salleh'];
   const ids = [];
+  const items = [];
   for (let i = 0; i < 36; i++) {
     const r = RANKS[Math.min(4, Math.floor(rnd(0, 100) / 22))];
     const senior = RANKS.indexOf(r);
@@ -21,8 +22,8 @@ module.exports = function ({ api, ok, sup }) {
     const q1 = Math.floor(pub * rnd(10, 35) / 100), q2 = Math.floor(pub * rnd(10, 30) / 100);
     const geran = rnd(0, 4) + senior * 2;
     const trend = {}; ['2020', '2021', '2022', '2023', '2024', '2025'].forEach((y) => { trend['pub' + y] = rnd(0, 2 + senior * 2); });
-    const d = call('crud.create', Object.assign({
-      module: 'staf', staffId: String(10000 + i * 37), gelaran: senior >= 3 ? 'PROF. DR.' : senior === 2 ? 'PROF. MADYA DR.' : 'DR.',
+    const item = Object.assign({
+      staffId: String(10000 + i * 37), gelaran: senior >= 3 ? 'PROF. DR.' : senior === 2 ? 'PROF. MADYA DR.' : 'DR.',
       nama: FIRST[i % FIRST.length] + ' ' + LAST[(i * 5) % LAST.length] + ' (Demo ' + (i + 1) + ')',
       email: i === 0 ? 'user@demo.local' : 'staf' + i + '@demo.local',
       jabatan: DEPTS[i % 4], jawatan: r[0], gred: r[1], sasaran: r[2], jawatanPentadbiran: i === 3 ? 'HOD' : i === 5 ? 'DEAN' : 'LECTURER',
@@ -39,12 +40,34 @@ module.exports = function ({ api, ok, sup }) {
       jkAntarabangsa: rnd(0, 2), jkKebangsaan: rnd(0, 3), jkUniversiti: rnd(0, 10), jkFakulti: rnd(2, 30), pengerusiSesi: rnd(0, 5),
       anugerahAntarabangsa: rnd(0, 2), anugerahKebangsaan: rnd(0, 2), anugerahUtm: rnd(0, 4), hakCipta: rnd(0, 3),
       lppt2025: rnd(80, 98), lppt2024: rnd(80, 98), lppt2023: rnd(i % 6 === 0 ? 70 : 82, 98)
-    }, trend));
-    ids.push(d);
+    }, trend);
+    items.push(item);
+    ids.push(call('crud.create', Object.assign({ module: 'staf' }, item)));
   }
   call('crud.setStatus', { module: 'staf', id: ids[35].id, status: 'BERSARA', note: 'Demo: bersara' });
   call('crud.create', { module: 'capaian', email: 'user@demo.local', nama: 'Staf demo', peranan: 'STAFF', skop: '' });
   call('crud.create', { module: 'capaian', email: 'user0@demo.local', nama: 'Ketua Jabatan demo', peranan: 'HOD', skop: 'KBPI' });
   call('crud.create', { module: 'capaian', email: 'user1@demo.local', nama: 'Dekan demo', peranan: 'DEAN' });
+  /* Sheet "sistem lama" rekaan (mock) untuk halaman Semakan Data: salinan data demo dalam format STAFF_PROFILE lama,
+     dengan 2 perbezaan sengaja (sitasi disunting, LPPT tidak sah) dan 1 staf yang belum diimport. */
+  if (ctx) {
+    const vm = require('vm');
+    const map = vm.runInContext('FkmImport.LEGACY_STAFF_MAP()', ctx), train = vm.runInContext('FkmImport.LEGACY_TRAINING()', ctx);
+    const cols = Object.keys(map);
+    const head = cols.concat(['status', 'training_json', 'pubtrend_json']);
+    const rows = [head].concat(items.map((it, i) => {
+      const r = cols.map((c) => (it[map[c]] === undefined ? '' : it[map[c]]));
+      if (i === 2) r[cols.indexOf('cit')] = Number(it.sitasi) + 15;
+      if (i === 4) r[cols.indexOf('lppt_2024')] = 2024;
+      const tj = {}; Object.keys(train).forEach((k) => { tj[k] = it[train[k]]; });
+      const pt = {}; ['2020', '2021', '2022', '2023', '2024', '2025'].forEach((y) => { pt[y] = it['pub' + y]; });
+      return r.concat([i === 35 ? 'BERSARA' : 'ACTIVE', JSON.stringify(tj), JSON.stringify(pt)]);
+    }));
+    const extra = rows[1].slice(); extra[cols.indexOf('staff_id')] = '19999'; extra[cols.indexOf('name')] = 'Staf Lama Belum Import (Demo)'; extra[cols.indexOf('email')] = 'lama@demo.local';
+    rows.push(extra);
+    ctx.__legacyRows = rows;
+    const id = vm.runInContext('(function(){ var ss = SpreadsheetApp.create("LEGACY_FKM_DEMO"); var sh = ss.insertSheet("STAFF_PROFILE"); sh.getRange(1, 1, __legacyRows.length, __legacyRows[0].length).setValues(__legacyRows); Env.set("LEGACY_SHEET_ID", ss.getId()); return ss.getId(); })()', ctx);
+    console.log('Sheet sistem lama rekaan: ' + id + ' (LEGACY_SHEET_ID)');
+  }
   console.log('Data demo FKM: 36 staf rekaan, capaian user@ (STAFF), user0@ (HOD KBPI), user1@ (DEAN)');
 };

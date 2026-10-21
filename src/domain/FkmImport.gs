@@ -89,22 +89,18 @@ const FkmImport = {
     return out;
   },
 
-  /**
-   * Import daripada Sheet sistem lama (baca sahaja).
-   * @param {string} sheetId ID Google Sheet lama
-   * @return {{staf:Object, capaian:Object, warnings:string[]}}
-   */
-  fromLegacySheet: function (sheetId, ctx) {
+  /** Buka Sheet sistem lama (baca sahaja) dengan ralat mesra. */
+  openLegacy: function (sheetId) {
     if (!/^[A-Za-z0-9_-]{10,100}$/.test(String(sheetId || ''))) throw Errors.validation('ID Google Sheet tidak sah.');
-    let ss;
-    try { ss = SpreadsheetApp.openById(sheetId); } catch (e) { throw Errors.validation('Sheet tidak dapat dibuka. Pastikan akaun pemilik skrip ini mempunyai akses kepadanya.'); }
+    try { return SpreadsheetApp.openById(sheetId); } catch (e) { throw Errors.validation('Sheet tidak dapat dibuka. Pastikan akaun pemilik skrip ini mempunyai akses kepadanya.'); }
+  },
 
-    const warnings = [];
+  /** STAFF_PROFILE lama → item medan modul staf (disahkan; nilai tidak sah dibuang dengan amaran). `_status` = status modul. */
+  legacyStaffItems: function (ss, warnings) {
     const map = FkmImport.LEGACY_STAFF_MAP();
     const trainMap = FkmImport.LEGACY_TRAINING();
     const stafDef = CrudEngine.get('staf');
-
-    const staffItems = FkmImport.readSheet(ss, 'STAFF_PROFILE').map(function (r) {
+    return FkmImport.readSheet(ss, 'STAFF_PROFILE').map(function (r) {
       const it = {};
       Object.keys(map).forEach(function (col) { if (r[col] !== undefined) it[map[col]] = r[col]; });
       it.staffId = FkmImport.normId(r.staff_id);
@@ -123,6 +119,99 @@ const FkmImport = {
       clean._status = FkmImport.legacyStatus(r.status);
       return clean;
     }).filter(function (it) { return it.staffId; });
+  },
+
+  /**
+   * Semakan integriti data (baca sahaja kedua-dua pihak): bandingkan Sheet sistem lama dengan pangkalan data baharu
+   * dan set data yang dipaparkan dashboard. Jumlah KPI dikira atas staf AKTIF (sama seperti kad dashboard).
+   */
+  reconcile: function (sheetId) {
+    const ss = FkmImport.openLegacy(sheetId);
+    const warnings = [];
+    const def = CrudEngine.get('staf');
+    const legacy = FkmImport.legacyStaffItems(ss, warnings);
+    const rows = CrudEngine.repo(def).all().filter(function (r) { return r.state === RECORD_STATE.ACTIVE; });
+    const byId = {};
+    rows.forEach(function (r) { byId[String(r.staff_id)] = r; });
+    const legIds = {};
+    legacy.forEach(function (it) { legIds[it.staffId] = it; });
+    const fields = def.fields.filter(function (f) { return !f.readonly && f.type !== 'files' && !f.adminOnly; });
+    const numeric = function (f) { return f.type === 'int' || f.type === 'number'; };
+    const norm = function (f, v) {
+      if (v === undefined || v === null || String(v).trim() === '') return f.type === 'bool' ? 'false' : '';
+      if (numeric(f)) { const x = Number(v); return isFinite(x) ? String(Math.round(x * 100) / 100) : String(v); }
+      if (f.type === 'bool') return String(v === true || String(v).toUpperCase() === 'TRUE');
+      if (f.type === 'email') return String(v).trim().toLowerCase();
+      return String(v).trim();
+    };
+
+    const diffs = [];
+    let same = 0;
+    legacy.forEach(function (it) {
+      const r = byId[it.staffId];
+      if (!r) return;
+      const list = [];
+      fields.forEach(function (f) {
+        if (f.key === 'staffId') return;
+        const a = norm(f, it[f.key]), b = norm(f, r[f.column]);
+        if (a !== b) list.push({ medan: f.label, lama: a, baharu: b });
+      });
+      if (it._status !== (r.status || 'AKTIF')) list.push({ medan: 'Status', lama: it._status, baharu: r.status });
+      if (list.length) diffs.push({ sid: it.staffId, nama: String(r.nama || ''), sumber: String(r.sumber_data || ''), cv: String(r.cv_dikemaskini || ''), medan: list });
+      else same++;
+    });
+
+    /* [medan modul, label, sifat set data dashboard] */
+    const KPI = [['pub', 'Jumlah Publication', 'pub'], ['scopusCount', 'Scopus Indexed', 'scopus'], ['wos', 'Web of Science', 'wos'], ['q1', 'Q1', 'q1'], ['q2', 'Q2', 'q2'],
+      ['sitasi', 'Jumlah Sitasi', 'sitasi'], ['hIndex', 'Jumlah Indeks-H', 'hindex'], ['geran', 'Jumlah Geran', 'geran'], ['geranAktif', 'Geran Aktif', 'geranAktif'],
+      ['geranPi', 'Geran sebagai PI', 'pi'], ['dana', 'Dana Penyelidikan (RM)', 'dana'], ['phdSelia', 'PhD Diselia', 'phd'], ['phdTamat', 'PhD Tamat', 'phdTamat'],
+      ['sarjanaSelia', 'Sarjana Diselia', 'ms'], ['sarjanaTamat', 'Sarjana Tamat', 'msTamat'], ['jamLatihan', 'Jam Latihan', 'jamLatihan'],
+      ['projekPerundingan', 'Projek Perundingan', 'perundingan'], ['nilaiPerundingan', 'Nilai Perundingan (RM)', 'nilaiPerundingan'], ['hakCipta', 'Hak Cipta', 'hakCipta']];
+    /* Set data dashboard: dikira daripada pangkalan data yang sama (cache dibatalkan setiap kali data berubah) */
+    const ds = FkmData.dataset();
+    const dsActive = ds.staff.filter(function (s) { return s.aktif; });
+    const fieldOf = {};
+    def.fields.forEach(function (f) { fieldOf[f.key] = f; });
+    const legActive = legacy.filter(function (it) { return it._status === 'AKTIF'; });
+    const newActive = rows.filter(function (r) { return FkmData.isActiveStatus(r.status); });
+    const round = function (x) { return Math.round(x * 100) / 100; };
+    const totals = KPI.map(function (k) {
+      const col = fieldOf[k[0]].column;
+      const lama = round(legActive.reduce(function (t, it) { return t + (Number(it[k[0]]) || 0); }, 0));
+      const baharu = round(newActive.reduce(function (t, r) { return t + (Number(r[col]) || 0); }, 0));
+      const dashboard = round(dsActive.reduce(function (t, x) { return t + (Number(x[k[2]]) || 0); }, 0));
+      return { medan: k[1], lama: lama, baharu: baharu, dashboard: dashboard };
+    });
+
+    const sumber = {};
+    rows.forEach(function (r) { const k = r.sumber_data || 'TIADA'; sumber[k] = (sumber[k] || 0) + 1; });
+    const demo = rows.filter(function (r) { return /@(demo|test)\.local$/i.test(String(r.email || '')) || /\(Demo \d+\)/.test(String(r.nama || '')); }).length;
+
+    return {
+      lama: { jumlah: legacy.length, aktif: legActive.length },
+      baharu: { jumlah: rows.length, aktif: newActive.length, sumber: sumber, demo: demo },
+      dashboard: { aktif: dsActive.length, pub: dsActive.reduce(function (t, s) { return t + s.pub; }, 0), dibina: ds.builtAt, padanPangkalan: dsActive.length === newActive.length },
+      sama: same,
+      berbeza: diffs.length,
+      hanyaLama: legacy.filter(function (it) { return !byId[it.staffId]; }).map(function (it) { return it.staffId; }),
+      hanyaBaharu: rows.filter(function (r) { return !legIds[String(r.staff_id)]; }).map(function (r) { return { sid: String(r.staff_id), nama: String(r.nama || ''), sumber: String(r.sumber_data || '') }; }),
+      totals: totals,
+      diffs: diffs.slice(0, 150),
+      amaran: warnings.slice(0, 100)
+    };
+  },
+
+  /**
+   * Import daripada Sheet sistem lama (baca sahaja).
+   * @param {string} sheetId ID Google Sheet lama
+   * @return {{staf:Object, capaian:Object, warnings:string[]}}
+   */
+  fromLegacySheet: function (sheetId, ctx) {
+    const ss = FkmImport.openLegacy(sheetId);
+
+    const warnings = [];
+    const stafDef = CrudEngine.get('staf');
+    const staffItems = FkmImport.legacyStaffItems(ss, warnings);
 
     const staf = CrudEngine.bulkUpsert(stafDef, ctx, staffItems, {
       keyField: 'staffId', onlyFilled: true,

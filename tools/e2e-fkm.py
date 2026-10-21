@@ -86,6 +86,9 @@ with sync_playwright() as p:
         assert pg.locator('[data-ua-tbl] tr[data-id]').count() >= 3
         pg.wait_for_selector('[data-al-tbl] table')
         visit(pg, '/fkm/cv', '[data-act="pick"]', vp + ' cv')
+        visit(pg, '/fkm/semak', '[data-out] table', vp + ' semakan data', 'fkm-%s-10-semak.png' % vp)
+        txt = pg.text_content('[data-out]')
+        assert 'Lim Ng (Demo 3)' in txt and '19999' in txt and 'LPPT 2024' in txt, 'semakan mengesan perbezaan sengaja dalam Sheet lama rekaan'
         visit(pg, '/fkm/import', '#fkmSheet', vp + ' import')
         visit(pg, '/profil', '.fk-app #view', vp + ' profil templat dalam shell FKM')
         if pg.is_visible('[data-act="fk-menu"]'):

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## FKM Talent 0.4.0 — 2026-10-21
+- Halaman **Semakan Data** (pentadbir, laluan `staf.semak`): baca Sheet sistem lama + pangkalan data baharu + set data dashboard, bandingkan setiap staf & setiap medan, jumlah KPI staf aktif (Sheet lama / pangkalan data / dashboard), staf tidak berpasangan, nilai tidak sah, pengesanan data demo. Baca sahaja.
+- `FkmImport.legacyStaffItems` dikongsi oleh import & semakan; dev server menyediakan Sheet lama rekaan (mock) dengan perbezaan sengaja untuk E2E.
+
 ## FKM Talent 0.3.0 — 2026-10-21
 - Halaman log masuk / daftar / lupa kata laluan gaya lama (kad "FKM · Academic Talent & Career Intelligence Dashboard"); halaman pemasaran templat diganti terus ke log masuk.
 - Borang Sunting & Tambah Staf bertab dalam modal (A. Profil, B. Penyelidikan & Geran, C. Pengajaran, Penyeliaan & Latihan, D. Khidmat, Anugerah & LPPT): kepala & kaki melekat, serlahan medan diubah, kiraan perubahan per tab, Undur Semua, amaran keluar tanpa simpan, tanda CV!/CV (medan yang ditimpa Auto-Extract), Staff ID dikunci, hanya medan diubah dihantar.

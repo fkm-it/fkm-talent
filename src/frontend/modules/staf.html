@@ -337,6 +337,7 @@ color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI
     ['/fkm/cv', '📄', 'Auto-Extract CV', 'Muat naik PDF CV & ekstrak automatik dalam pelayar', 'ADMIN', 'admin'],
     ['/fkm/penasihat', '☉', 'AI Career Advisor', 'Penasihat kerjaya berasaskan AI', ALL, 'user'],
     ['/fkm/capaian', '⚿', 'User Access Control', 'Kawalan capaian dan audit log', 'ADMIN', 'admin'],
+    ['/fkm/semak', '✓', 'Semakan Data', 'Bandingkan Sheet sistem lama dengan pangkalan data & dashboard baharu', 'ADMIN', 'admin'],
     ['/fkm/import', '⇩', 'Import Sistem Lama', 'Salin data daripada Google Sheet sistem lama (baca sahaja)', 'SUPER', 'super']
   ];
   const navFor = (path) => NAV.filter((n) => n[0] === path)[0];
@@ -1321,6 +1322,47 @@ function extractCVfields(fullRaw){
     }));
   }, { roles: ['ADMIN'], allowEmpty: true });
 
+
+  /* ================================================================ SEMAKAN DATA (pentadbir): sistem lama vs pangkalan data vs dashboard */
+  KD.views.fkmSemak = page((w) => {
+    w.innerHTML = html`<div class="fk-card" style="margin-bottom:16px"><div class="fk-card-title">Semakan Integriti Data</div>
+      <div class="fk-card-sub">Membaca Sheet sistem lama (STAFF_PROFILE) dan pangkalan data baharu, kemudian membandingkan setiap staf, setiap medan dan jumlah KPI yang dipaparkan dashboard. Baca sahaja — tiada data diubah.</div>
+      <form class="fk-inline" data-form><input type="text" name="sheetId" placeholder="ID Sheet lama (kosong = LEGACY_SHEET_ID)" style="flex:1;min-width:220px;padding:9px 12px;font-size:13px" aria-label="ID Sheet lama">
+        <button class="fk-btn-primary" type="submit" style="padding:9px 16px;font-size:12.5px">✓ Jalankan Semakan</button></form></div><div data-out></div>`.s;
+    const out = qs('[data-out]', w);
+    const fmt = (v) => (typeof v === 'number' ? fmtNum(v) : v === '' ? '—' : v);
+    const run = (btn) => KD.ui.busy(btn, async () => {
+      out.innerHTML = '<div class="fk-loading">Membandingkan data… (beberapa saat)</div>';
+      try {
+        const r = await KD.api.call('staf.semak', { sheetId: qs('[name=sheetId]', w).value.trim() });
+        const totOk = r.totals.filter((t) => t.lama === t.dashboard).length;
+        const allOk = !r.berbeza && !r.hanyaLama.length && totOk === r.totals.length && r.dashboard.padanPangkalan && !r.baharu.demo;
+        const src = Object.keys(r.baharu.sumber).map((k) => k + ' ' + r.baharu.sumber[k]).join(' · ');
+        out.innerHTML = html`<div class="fk-alert ${allOk ? 'green' : ''}">${allOk
+            ? html`<strong>✓ Data sepadan sepenuhnya.</strong> Setiap staf dan setiap medan dalam pangkalan data baharu sama dengan Sheet sistem lama, dan dashboard dikira daripada pangkalan data yang sama.`
+            : html`<strong>Ringkasan:</strong> ${r.sama} staf sepadan sepenuhnya, ${r.berbeza} staf ada perbezaan medan${r.hanyaLama.length ? ', ' + r.hanyaLama.length + ' staf hanya dalam sistem lama' : ''}${r.hanyaBaharu.length ? ', ' + r.hanyaBaharu.length + ' staf hanya dalam sistem baharu' : ''}. Perbezaan bagi staf bersumber <strong>CV</strong> atau <strong>MANUAL</strong> adalah dijangka (dikemas kini selepas import).`}
+            ${r.baharu.demo ? html`<br><strong style="color:var(--red)">Amaran: ${r.baharu.demo} rekod kelihatan seperti data demo/ujian.</strong>` : ''}</div>
+          <div class="fk-kpi-grid">${kpi(r.lama.aktif + ' / ' + r.lama.jumlah, 'Sistem Lama (aktif / jumlah)', '--purple')}${kpi(r.baharu.aktif + ' / ' + r.baharu.jumlah, 'Pangkalan Data Baharu (aktif / jumlah)', '--brand')}
+            ${kpi(r.dashboard.aktif, 'Staf Aktif di Dashboard', r.dashboard.padanPangkalan ? '--green' : '--red')}${kpi(r.sama, 'Staf Sepadan Sepenuhnya', '--green')}${kpi(r.berbeza, 'Staf Ada Perbezaan', r.berbeza ? '--amber' : '--green')}</div>
+          <p class="fk-mini" style="margin:-8px 0 16px">Sumber rekod: ${src || '—'} · set data dashboard dikira ${r.dashboard.dibina ? new Date(r.dashboard.dibina).toLocaleString('ms-MY', { dateStyle: 'medium', timeStyle: 'short' }) : '—'}</p>
+          <div style="margin-bottom:16px">${card('Jumlah KPI (staf aktif)', totOk + ' daripada ' + r.totals.length + ' jumlah sama — angka ini ialah yang dipaparkan pada kad dashboard',
+            tbl(['Medan', 'Sheet Lama', 'Pangkalan Data Baharu', 'Dipaparkan Dashboard', 'Beza (Lama → Dashboard)'], r.totals.map((t) => { const d = Math.round((t.dashboard - t.lama) * 100) / 100; return html`<tr><td><strong>${t.medan}</strong></td><td>${fmtNum(t.lama)}</td><td>${fmtNum(t.baharu)}</td>
+              <td><strong>${fmtNum(t.dashboard)}</strong>${t.dashboard !== t.baharu ? html`<div class="fk-mini" title="Dashboard mengira jumlah jam daripada kategori latihan jika medan jumlah kosong">dikira daripada kategori</div>` : ''}</td>
+              <td><span class="fk-badge ${d ? 'b-amber' : 'b-green'}">${d ? (d > 0 ? '+' : '') + fmtNum(d) : 'SAMA'}</span></td></tr>`; })))}</div>
+          ${r.diffs.length ? html`<div style="margin-bottom:16px">${card('Perbezaan Mengikut Staf', 'Medan yang berbeza antara Sheet lama dan pangkalan data baharu' + (r.berbeza > r.diffs.length ? ' (' + r.diffs.length + ' pertama dipaparkan)' : ''),
+            tbl(['Staf', 'Sumber', 'Medan', 'Sistem Lama', 'Sistem Baharu'], r.diffs.reduce((acc, x) => acc.concat(x.medan.map((m, i) => html`<tr ${i ? '' : raw('style="border-top:2px solid var(--border)"')}>
+              <td>${i ? '' : html`<strong>${x.nama || '—'}</strong><div class="fk-mini">ID ${x.sid}</div>`}</td><td>${i ? '' : html`<span class="fk-badge ${x.sumber === 'IMPORT' ? 'b-red' : 'b-blue'}">${x.sumber || '—'}</span>${x.cv ? html`<div class="fk-mini">CV ${x.cv}</div>` : ''}`}</td>
+              <td>${m.medan}</td><td>${fmt(m.lama)}</td><td><strong>${fmt(m.baharu)}</strong></td></tr>`)), [])))}</div>` : ''}
+          ${r.hanyaLama.length || r.hanyaBaharu.length ? html`<div style="margin-bottom:16px">${card('Staf Tidak Berpasangan', '', html`
+            ${r.hanyaLama.length ? html`<p class="fk-mini"><strong>Hanya dalam sistem lama (belum diimport):</strong> ${r.hanyaLama.join(', ')}</p>` : ''}
+            ${r.hanyaBaharu.length ? html`<p class="fk-mini"><strong>Hanya dalam sistem baharu:</strong> ${r.hanyaBaharu.map((x) => x.nama + ' (' + x.sid + ', ' + (x.sumber || '—') + ')').join(', ')}</p>` : ''}`)}</div>` : ''}
+          ${r.amaran.length ? card('Nilai Tidak Sah dalam Sheet Lama (' + r.amaran.length + ')', 'Nilai ini tidak dibawa ke sistem baharu (cth. LPPT 2024 bukan peratus)', html`<ul class="fk-mini" style="margin:0;padding-left:18px;line-height:1.7">${r.amaran.map((a) => html`<li>${a}</li>`)}</ul>`) : ''}`.s;
+      } catch (err) { out.innerHTML = html`${emptyCard('Semakan gagal', (err && err.message) || 'Sila cuba semula.')}`.s; }
+    });
+    on(w, 'submit', '[data-form]', (e, f) => { e.preventDefault(); run(qs('button', f)); });
+    run(qs('[data-form] button', w));
+  }, { roles: ['ADMIN'], allowEmpty: true });
+
   /* ================================================================ IMPORT SISTEM LAMA (Super Admin) */
   KD.views.fkmImport = page((w) => {
     w.innerHTML = html`<div class="fk-card"><div class="fk-card-title">Import Sistem Lama</div><div class="fk-card-sub">Salin data staf (STAFF_PROFILE) & senarai capaian (USER_ACCESS) daripada Google Sheet sistem lama. Sheet lama hanya DIBACA — tiada perubahan dibuat padanya.</div>
@@ -1366,7 +1408,7 @@ function extractCVfields(fullRaw){
 
   /* ================================================================ LALUAN */
   const VIEW = { '/fkm/staf': 'fkmStaf', '/fkm/kenaikan': 'fkmKenaikan', '/fkm/latihan': 'fkmLatihan', '/fkm/penyelidikan': 'fkmPenyelidikan', '/fkm/geran': 'fkmGeran',
-    '/fkm/penyeliaan': 'fkmPenyeliaan', '/fkm/khidmat': 'fkmKhidmat', '/fkm/myra': 'fkmMyra', '/fkm/cv': 'fkmCv', '/fkm/penasihat': 'fkmPenasihat', '/fkm/capaian': 'fkmCapaian', '/fkm/import': 'fkmImport' };
+    '/fkm/penyeliaan': 'fkmPenyeliaan', '/fkm/khidmat': 'fkmKhidmat', '/fkm/myra': 'fkmMyra', '/fkm/cv': 'fkmCv', '/fkm/penasihat': 'fkmPenasihat', '/fkm/capaian': 'fkmCapaian', '/fkm/semak': 'fkmSemak', '/fkm/import': 'fkmImport' };
   NAV.forEach((n) => { if (VIEW[n[0]]) KD.extraRoutes.push({ path: n[0], view: VIEW[n[0]], access: n[5], layout: 'app', title: n[2], sub: n[3] }); });
   KD.extraRoutes.push({ path: '/fkm/staf/:sid', view: 'fkmProfil', access: 'user', layout: 'app', title: 'Staff Profile', navPath: '/fkm/staf' });
   /* Panel pentadbir templat: pautan kembali ke dashboard FKM */

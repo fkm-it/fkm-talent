@@ -222,7 +222,24 @@ const TestSuiteFkm = {
       const again = TestAssert.apiOk(TestHelpers.call(sup.token, 'staf.importLegacy', { sheetId: legacy.getId() }));
       t.eq(again.staf.added + again.staf.updated, 0, 'import semula idempoten');
       t.eq(again.capaian.added + again.capaian.updated, 0);
+      /* Semakan integriti: selepas import semua padan; suntingan selepas import dikesan per medan */
       const u = FkmT.user('rekaan.satu@utm.my');
+      const adm = TestHelpers.admin(ROLES.ADMIN);
+      let chk = TestAssert.apiOk(TestHelpers.call(adm.token, 'staf.semak', { sheetId: legacy.getId() }));
+      t.eq(chk.lama.jumlah, 2); t.eq(chk.berbeza, 0, 'tiada beza selepas import'); t.eq(chk.sama, 2);
+      t.eq(chk.hanyaLama.length, 0);
+      const tPub = chk.totals.filter(function (x) { return x.medan === 'Jumlah Publication'; })[0];
+      t.eq(tPub.lama, 58, 'jumlah KPI atas staf aktif sahaja (bersara dikecualikan)');
+      t.ok(chk.totals.every(function (x) { return x.medan !== 'Jumlah Publication' || x.baharu >= x.lama; }));
+      t.ok(chk.dashboard.padanPangkalan, 'dashboard dikira daripada pangkalan data yang sama');
+      t.eq(tPub.dashboard, tPub.baharu, 'jumlah dashboard = jumlah pangkalan data');
+      TestAssert.apiOk(TestHelpers.call(adm.token, 'crud.update', { module: 'staf', id: am.id, sitasi: 999 }));
+      chk = TestAssert.apiOk(TestHelpers.call(adm.token, 'staf.semak', { sheetId: legacy.getId() }));
+      const d1 = chk.diffs.filter(function (x) { return x.sid === '4321'; })[0];
+      t.ok(d1 && d1.sumber === 'MANUAL' && d1.medan.some(function (m) { return m.medan === 'Sitasi' && m.lama === '731' && m.baharu === '999'; }), 'beza medan dilaporkan dengan sumber');
+      t.eq(JSON.stringify(sp.getDataRange().getValues()), before, 'semakan tidak mengubah sheet lama');
+      TestAssert.apiFail(TestHelpers.call(u.token, 'staf.semak', { sheetId: legacy.getId() }), ERROR_CODES.FORBIDDEN);
+
       const mine = FkmT.data(u);
       t.eq(mine.staff.length, 1);
       t.eq(mine.staff[0].latihan.kepimpinan, 43.8);
