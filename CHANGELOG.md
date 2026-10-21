@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## FKM Talent 0.4.1 — 2026-10-21
+- Semakan Data: jarak berganda / NBSP dalam teks tidak lagi dikira sebagai perbezaan.
+
 ## FKM Talent 0.4.0 — 2026-10-21
 - Halaman **Semakan Data** (pentadbir, laluan `staf.semak`): baca Sheet sistem lama + pangkalan data baharu + set data dashboard, bandingkan setiap staf & setiap medan, jumlah KPI staf aktif (Sheet lama / pangkalan data / dashboard), staf tidak berpasangan, nilai tidak sah, pengesanan data demo. Baca sahaja.
 - `FkmImport.legacyStaffItems` dikongsi oleh import & semakan; dev server menyediakan Sheet lama rekaan (mock) dengan perbezaan sengaja untuk E2E.

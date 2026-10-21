@@ -142,7 +142,7 @@ const FkmImport = {
       if (numeric(f)) { const x = Number(v); return isFinite(x) ? String(Math.round(x * 100) / 100) : String(v); }
       if (f.type === 'bool') return String(v === true || String(v).toUpperCase() === 'TRUE');
       if (f.type === 'email') return String(v).trim().toLowerCase();
-      return String(v).trim();
+      return String(v).replace(/[\s\u00a0]+/g, ' ').trim(); /* jarak berganda / NBSP bukan perbezaan data */
     };
 
     const diffs = [];
