@@ -488,8 +488,16 @@ function extractCVfields(fullRaw){
   d.name=F(/Name\s+([A-Z][A-Z\s@'.\/-]+?)\s+Tel/i);
   d.email=F(/E-?mail\s+([^\s]+@[^\s]+)/i);
   d.scopus_id=F(/SCOPUS\s+(\d{6,})/i);
-  const lppt=full.match(/LPPT Marks[\s\S]*?([\d.]+)\s+([\d.]+)\s+([\d.]+)/i);
-  if(lppt){d.lppt_2025=+lppt[1];d.lppt_2024=+lppt[2];d.lppt_2023=+lppt[3];}
+  /* LPPT: HANYA nombor yang terus mengikuti label (hingga 3, setiap satu 0-100).
+   * PEMBETULAN (Okt 2026): regex lama [\s\S]*? melangkau ke nombor seterusnya dalam dokumen jika staf
+   * belum ada markah LPPT — tahun/tarikh (cth. 2024, 2579) tersimpan sebagai LPPT dan "lulus" gatekeeper. */
+  const lpm=full.match(/LPPT Marks(?:\s*\(\d+\s*years?\))?\s*((?:\d{1,3}(?:\.\d+)?\s+){0,3})/i);
+  if(lpm){
+    const v=lpm[1].trim().split(/\s+/).filter(Boolean).map(Number).filter(x=>x>=0&&x<=100);
+    if(v.length>0)d.lppt_2025=v[0];
+    if(v.length>1)d.lppt_2024=v[1];
+    if(v.length>2)d.lppt_2023=v[2];
+  }
   d.pub_wos=N(S(/ISI Article\/Journal WOS\s+(\d+)/i));
   d.pub_scopus=N(S(/Scopus Article\/Journal\s+(\d+)/i));
   d.pub_conf=N(S(/Indexed Conference Proceedings\s+(\d+)/i));

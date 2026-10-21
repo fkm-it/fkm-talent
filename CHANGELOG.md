@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## FKM Talent 0.1.1 — 2026-10-21
+- Pengekstrak CV: markah LPPT hanya diambil terus selepas label `LPPT Marks (3 years)` dan mesti 0–100. Sebelum ini (warisan sistem lama) CV tanpa markah LPPT tersalah ambil nombor lain (cth. tahun 2024) dan staf itu "lulus" gatekeeper LPPT.
+
 ## FKM Talent 0.1.0 — 2026-10-21
 Versi pertama sistem baharu (berasingan daripada sistem Apps Script lama).
 - Modul `staf` (85 medan profil + KPI, status perkhidmatan) dan `capaian` (senarai putih pendaftaran, peranan DEAN/HOD/STAFF + skop).
